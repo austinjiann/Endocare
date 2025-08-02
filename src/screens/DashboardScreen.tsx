@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import { useEndoCare } from '../context/EndoCareContext';
-import QuickSymptomLogger from '../components/QuickSymptomLogger';
+import PredictionSummaryBoard from '../components/PredictionSummaryBoard';
+import TriggerHeatmap from '../components/TriggerHeatmap';
 
 const DashboardScreen = ({ navigation }: any) => {
   const { state } = useEndoCare();
@@ -48,7 +48,6 @@ const DashboardScreen = ({ navigation }: any) => {
       onPress={onPress}
     >
       <View style={styles.cardHeader}>
-        <Text style={styles.cardIcon}>{iconText}</Text>
         <Text style={styles.cardTitle}>{title}</Text>
       </View>
       <Text style={styles.cardSubtitle}>{subtitle}</Text>
@@ -60,19 +59,19 @@ const DashboardScreen = ({ navigation }: any) => {
       <Text style={styles.overviewTitle}>7-Day Symptom Averages</Text>
       <View style={styles.symptomRow}>
         <View style={styles.symptomItem}>
-          <Text style={[styles.symptomValue, { color: '#FF6B9D' }]}>
+          <Text style={[styles.symptomValue, { color: '#C8A8D8' }]}>
             {avgSymptoms.nausea}
           </Text>
           <Text style={styles.symptomLabel}>Nausea</Text>
         </View>
         <View style={styles.symptomItem}>
-          <Text style={[styles.symptomValue, { color: '#4ECDC4' }]}>
+          <Text style={[styles.symptomValue, { color: '#C8A8D8' }]}>
             {avgSymptoms.fatigue}
           </Text>
           <Text style={styles.symptomLabel}>Fatigue</Text>
         </View>
         <View style={styles.symptomItem}>
-          <Text style={[styles.symptomValue, { color: '#FF8E53' }]}>
+          <Text style={[styles.symptomValue, { color: '#C8A8D8' }]}>
             {avgSymptoms.pain}
           </Text>
           <Text style={styles.symptomLabel}>Pain</Text>
@@ -82,16 +81,24 @@ const DashboardScreen = ({ navigation }: any) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>EndoCare</Text>
-      <Text style={styles.subheader}>Managing endometriosis together</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#C8A8D8" />
+      <View style={styles.headerContainer}>
+        <View style={styles.headerGradient}>
+          <Text style={styles.header}>EndoCare Dashboard</Text>
+          <Text style={styles.subheader}>Managing endometriosis together</Text>
+        </View>
+      </View>
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Quick symptom logger */}
-        <QuickSymptomLogger />
+        {/* Prediction and summary board */}
+        <PredictionSummaryBoard />
         
         {/* Symptom overview */}
         <SymptomOverviewCard />
+        
+        {/* Trigger Severity Heatmap */}
+        <TriggerHeatmap />
         
         {/* Navigation cards */}
         <Text style={styles.sectionTitle}>Track Your Health</Text>
@@ -102,8 +109,8 @@ const DashboardScreen = ({ navigation }: any) => {
             `Last: ${recentPeriodLog.type} on ${new Date(recentPeriodLog.date).toLocaleDateString()}` : 
             'Start tracking your cycle'
           }
-          backgroundColor="#FFE5F1"
-          iconText="🩸"
+          backgroundColor="#F4F1F7"
+          iconText=""
           onPress={() => navigation.navigate('Period')}
         />
         
@@ -113,8 +120,8 @@ const DashboardScreen = ({ navigation }: any) => {
             `Last meal: ${recentFoodLog.foodItems.substring(0, 30)}...` : 
             'Track potential trigger foods'
           }
-          backgroundColor="#E8F4FD"
-          iconText="🍽️"
+          backgroundColor="#F4F1F7"
+          iconText=""
           onPress={() => navigation.navigate('Food')}
         />
         
@@ -124,8 +131,8 @@ const DashboardScreen = ({ navigation }: any) => {
             `Last night: ${recentSleepLog.hoursSlept}h (${recentSleepLog.sleepQuality}/10)` : 
             'Monitor sleep quality'
           }
-          backgroundColor="#F5F5DC"
-          iconText="😴"
+          backgroundColor="#F4F1F7"
+          iconText=""
           onPress={() => navigation.navigate('Sleep')}
         />
         
@@ -146,45 +153,66 @@ const DashboardScreen = ({ navigation }: any) => {
         <View style={styles.statsContainer}>
           <Text style={styles.statsTitle}>Tracking Progress</Text>
           <Text style={styles.statsText}>
-            📊 Total Entries: {state.symptomLogs.length + state.periodLogs.length + state.foodLogs.length + state.sleepLogs.length}
+            Total Entries: {state.symptomLogs.length + state.periodLogs.length + state.foodLogs.length + state.sleepLogs.length}
           </Text>
           <Text style={styles.statsText}>
-            🩸 Period Logs: {state.periodLogs.length}
+            Period Logs: {state.periodLogs.length}
           </Text>
           <Text style={styles.statsText}>
-            🍽️ Food Logs: {state.foodLogs.length}
+            Food Logs: {state.foodLogs.length}
           </Text>
           <Text style={styles.statsText}>
-            😴 Sleep Logs: {state.sleepLogs.length}
+            Sleep Logs: {state.sleepLogs.length}
           </Text>
           <Text style={styles.statsText}>
-            📝 Symptom Logs: {state.symptomLogs.length}
+            Symptom Logs: {state.symptomLogs.length}
           </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FEFEFE',
+    backgroundColor: '#F4F1F7',
+    paddingHorizontal: 0,
+  },
+  headerContainer: {
+    marginBottom: 0,
+    position: 'relative',
+  },
+  headerGradient: {
+    backgroundColor: '#C8A8D8',
+    paddingTop: 60,
+    paddingBottom: 25,
     paddingHorizontal: 20,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+    shadowColor: '#C8A8D8',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 5,
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subheader: {
     fontSize: 16,
-    color: '#7F8C8D',
-    marginBottom: 20,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    opacity: 0.9,
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   symptomOverviewCard: {
     backgroundColor: '#F8F9FA',
@@ -192,7 +220,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#9370DB',
+    borderLeftColor: '#C8A8D8',
   },
   overviewTitle: {
     fontSize: 16,
@@ -219,8 +247,9 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 15,
+    color: '#C8A8D8',
+    marginBottom: 20,
+    marginTop: 10,
   },
   trackerCard: {
     padding: 20,
@@ -233,25 +262,19 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 8,
-  },
-  cardIcon: {
-    fontSize: 20,
-    marginRight: 10,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2C3E50',
+    color: '#C8A8D8',
   },
   cardSubtitle: {
     fontSize: 14,
     color: '#7F8C8D',
   },
   detailedSymptomButton: {
-    backgroundColor: '#9370DB',
+    backgroundColor: '#C8A8D8',
     padding: 20,
     borderRadius: 15,
     alignItems: 'center',

@@ -6,11 +6,12 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert 
+  Alert,
+  StatusBar 
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import SymptomSlider from '../components/SymptomSlider';
+import DatePickerInput from '../components/DatePickerInput';
 
 const SymptomScreen = () => {
   const { state, addSymptomLog } = useEndoCare();
@@ -20,26 +21,30 @@ const SymptomScreen = () => {
   const [pain, setPain] = useState(1);
   const [notes, setNotes] = useState('');
 
-  const handleLogSymptoms = () => {
+  const handleLogSymptoms = async () => {
     if (!selectedDate) {
       Alert.alert('Error', 'Please select a date');
       return;
     }
 
-    addSymptomLog({
-      date: selectedDate,
-      nausea,
-      fatigue,
-      pain,
-      notes: notes.trim(),
-    });
+    try {
+      await addSymptomLog({
+        date: selectedDate,
+        nausea,
+        fatigue,
+        pain,
+        notes: notes.trim(),
+      });
 
-    // Reset form
-    setNausea(1);
-    setFatigue(1);
-    setPain(1);
-    setNotes('');
-    Alert.alert('Success', 'Symptoms logged successfully!');
+      // Reset form
+      setNausea(1);
+      setFatigue(1);
+      setPain(1);
+      setNotes('');
+      Alert.alert('Success', 'Symptoms logged successfully!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to log symptoms. Please try again.');
+    }
   };
 
   const getSymptomInsight = () => {
@@ -60,19 +65,24 @@ const SymptomScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Symptom Tracker</Text>
-      <Text style={styles.subheader}>Record how you're feeling today</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#FFB380" />
+      <View style={styles.headerContainer}>
+        <View style={styles.headerGradient}>
+          <Text style={styles.header}>Symptom Tracker</Text>
+          <Text style={styles.subheader}>Record how you're feeling today</Text>
+        </View>
+      </View>
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Date Selection */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Date</Text>
-          <TextInput
-            style={styles.dateInput}
+          <DatePickerInput
             value={selectedDate}
-            onChangeText={setSelectedDate}
-            placeholder="YYYY-MM-DD"
+            onDateChange={setSelectedDate}
+            themeColor="#FFB380"
+            placeholder="Select symptom date"
           />
         </View>
 
@@ -87,7 +97,7 @@ const SymptomScreen = () => {
             label="Nausea"
             value={nausea}
             onValueChange={setNausea}
-            color="#FF6B9D"
+            color="#FFB380"
             description="Feeling sick, queasy, or wanting to vomit"
           />
           
@@ -95,7 +105,7 @@ const SymptomScreen = () => {
             label="Fatigue"
             value={fatigue}
             onValueChange={setFatigue}
-            color="#4ECDC4"
+            color="#FFB380"
             description="Tiredness, exhaustion, lack of energy"
           />
           
@@ -103,7 +113,7 @@ const SymptomScreen = () => {
             label="Pain"
             value={pain}
             onValueChange={setPain}
-            color="#FF8E53"
+            color="#FFB380"
             description="Cramping, aching, sharp or dull pain"
           />
         </View>
@@ -132,7 +142,7 @@ const SymptomScreen = () => {
           <Text style={styles.insightText}>{getSymptomInsight()}</Text>
           {/* TODO: Add graphical trend visualization */}
           <Text style={styles.futureFeature}>
-            📈 Coming soon: Visual symptom trends and correlation analysis
+            Coming soon: Visual symptom trends and correlation analysis
           </Text>
         </View>
 
@@ -148,17 +158,17 @@ const SymptomScreen = () => {
                   <Text style={styles.logDate}>{log.date}</Text>
                   <View style={styles.logSymptoms}>
                     <View style={styles.symptomBadge}>
-                      <Text style={[styles.symptomBadgeText, { color: '#FF6B9D' }]}>
+                      <Text style={[styles.symptomBadgeText, { color: '#FF8C42' }]}>
                         N: {log.nausea}
                       </Text>
                     </View>
                     <View style={styles.symptomBadge}>
-                      <Text style={[styles.symptomBadgeText, { color: '#4ECDC4' }]}>
+                      <Text style={[styles.symptomBadgeText, { color: '#FF8C42' }]}>
                         F: {log.fatigue}
                       </Text>
                     </View>
                     <View style={styles.symptomBadge}>
-                      <Text style={[styles.symptomBadgeText, { color: '#FF8E53' }]}>
+                      <Text style={[styles.symptomBadgeText, { color: '#FF8C42' }]}>
                         P: {log.pain}
                       </Text>
                     </View>
@@ -172,38 +182,65 @@ const SymptomScreen = () => {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FEFEFE',
+    backgroundColor: '#FBF6F2',
+  },
+  headerContainer: {
+    marginBottom: 0,
+  },
+  headerGradient: {
+    backgroundColor: '#FFB380',
+    paddingTop: 60,
+    paddingBottom: 25,
     paddingHorizontal: 20,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+    shadowColor: '#FFB380',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 5,
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subheader: {
     fontSize: 16,
-    color: '#7F8C8D',
-    marginBottom: 20,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    opacity: 0.9,
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   section: {
-    marginBottom: 25,
+    marginBottom: 30,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 10,
+    color: '#FFB380',
+    marginBottom: 15,
   },
   sectionSubtitle: {
     fontSize: 14,
@@ -229,7 +266,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   logButton: {
-    backgroundColor: '#9370DB',
+    backgroundColor: '#FFB380',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -241,12 +278,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   insightCard: {
-    backgroundColor: '#F3E5F5',
+    backgroundColor: '#FFF2EB',
     padding: 20,
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#9370DB',
+    borderLeftColor: '#FFB380',
   },
   insightTitle: {
     fontSize: 16,
@@ -277,7 +314,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#9370DB',
+    borderLeftColor: '#FFB380',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,

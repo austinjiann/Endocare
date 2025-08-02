@@ -6,11 +6,12 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert 
+  Alert,
+  StatusBar 
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import SymptomSlider from '../components/SymptomSlider';
+import DatePickerInput from '../components/DatePickerInput';
 
 const PeriodScreen = () => {
   const { state, addPeriodLog } = useEndoCare();
@@ -22,31 +23,35 @@ const PeriodScreen = () => {
   const [pain, setPain] = useState(1);
   const [notes, setNotes] = useState('');
 
-  const handleLogPeriod = () => {
+  const handleLogPeriod = async () => {
     if (!selectedDate) {
       Alert.alert('Error', 'Please select a date');
       return;
     }
 
-    addPeriodLog({
-      date: selectedDate,
-      type: periodType,
-      flowLevel,
-      associatedSymptoms: {
-        nausea,
-        fatigue,
-        pain,
-      },
-      notes: notes.trim(),
-    });
+    try {
+      await addPeriodLog({
+        date: selectedDate,
+        type: periodType,
+        flowLevel,
+        associatedSymptoms: {
+          nausea,
+          fatigue,
+          pain,
+        },
+        notes: notes.trim(),
+      });
 
-    // Reset form
-    setFlowLevel(1);
-    setNausea(1);
-    setFatigue(1);
-    setPain(1);
-    setNotes('');
-    Alert.alert('Success', 'Period log added successfully!');
+      // Reset form
+      setFlowLevel(1);
+      setNausea(1);
+      setFatigue(1);
+      setPain(1);
+      setNotes('');
+      Alert.alert('Success', 'Period log added successfully!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to add period log. Please try again.');
+    }
   };
 
   const TypeButton = ({ type, label }: { type: 'start' | 'end'; label: string }) => (
@@ -100,30 +105,35 @@ const PeriodScreen = () => {
     
     let insight = '';
     if (avgPain > 7) {
-      insight = '⚠️ High pain levels during periods. Consider discussing pain management with your healthcare provider.';
+      insight = 'High pain levels during periods. Consider discussing pain management with your healthcare provider.';
     } else if (avgPain > 4) {
-      insight = '📊 Moderate pain levels detected. Track triggers and relief methods.';
+      insight = 'Moderate pain levels detected. Track triggers and relief methods.';
     } else {
-      insight = '✅ Pain levels appear manageable during recent cycles.';
+      insight = 'Pain levels appear manageable during recent cycles.';
     }
     
     return insight;
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Period Tracker</Text>
-      <Text style={styles.subheader}>Track your cycle and associated symptoms</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#F4A8C0" />
+      <View style={styles.headerContainer}>
+        <View style={styles.headerGradient}>
+          <Text style={styles.header}>Period Tracker</Text>
+          <Text style={styles.subheader}>Track your cycle and associated symptoms</Text>
+        </View>
+      </View>
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Date Selection */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Date</Text>
-          <TextInput
-            style={styles.dateInput}
+          <DatePickerInput
             value={selectedDate}
-            onChangeText={setSelectedDate}
-            placeholder="YYYY-MM-DD"
+            onDateChange={setSelectedDate}
+            themeColor="#F4A8C0"
+            placeholder="Select period date"
           />
         </View>
 
@@ -223,38 +233,65 @@ const PeriodScreen = () => {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FEFEFE',
+    backgroundColor: '#FAF4F7',
+  },
+  headerContainer: {
+    marginBottom: 0,
+  },
+  headerGradient: {
+    backgroundColor: '#F4A8C0',
+    paddingTop: 60,
+    paddingBottom: 25,
     paddingHorizontal: 20,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+    shadowColor: '#F4A8C0',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 5,
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subheader: {
     fontSize: 16,
-    color: '#7F8C8D',
-    marginBottom: 20,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    opacity: 0.9,
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   section: {
-    marginBottom: 25,
+    marginBottom: 30,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 10,
+    color: '#F4A8C0',
+    marginBottom: 15,
   },
   sectionSubtitle: {
     fontSize: 14,
@@ -283,15 +320,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   typeButtonSelected: {
-    backgroundColor: '#FFE5F1',
-    borderColor: '#FF6B9D',
+    backgroundColor: '#FBEDF2',
+    borderColor: '#F4A8C0',
   },
   typeButtonText: {
     fontSize: 16,
     color: '#2C3E50',
   },
   typeButtonTextSelected: {
-    color: '#FF6B9D',
+    color: '#F4A8C0',
     fontWeight: '600',
   },
   flowContainer: {
@@ -306,15 +343,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   flowButtonSelected: {
-    backgroundColor: '#FFE5F1',
-    borderColor: '#FF6B9D',
+    backgroundColor: '#FBEDF2',
+    borderColor: '#F4A8C0',
   },
   flowButtonText: {
     fontSize: 14,
     color: '#2C3E50',
   },
   flowButtonTextSelected: {
-    color: '#FF6B9D',
+    color: '#F4A8C0',
     fontWeight: '600',
   },
   notesInput: {
@@ -328,7 +365,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   logButton: {
-    backgroundColor: '#FF6B9D',
+    backgroundColor: '#F4A8C0',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -340,12 +377,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   insightCard: {
-    backgroundColor: '#FFE5F1',
+    backgroundColor: '#FBEDF2',
     padding: 20,
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF6B9D',
+    borderLeftColor: '#F4A8C0',
   },
   insightTitle: {
     fontSize: 16,
@@ -376,7 +413,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF6B9D',
+    borderLeftColor: '#F4A8C0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -405,10 +442,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   startType: {
-    color: '#FF6B9D',
+    color: '#F4A8C0',
   },
   endType: {
-    color: '#4ECDC4',
+    color: '#F4A8C0',
   },
   logDetail: {
     fontSize: 14,

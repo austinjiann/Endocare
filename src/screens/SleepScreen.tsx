@@ -6,11 +6,12 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert 
+  Alert,
+  StatusBar 
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import SymptomSlider from '../components/SymptomSlider';
+import DatePickerInput from '../components/DatePickerInput';
 
 const SleepScreen = () => {
   const { state, addSleepLog } = useEndoCare();
@@ -23,7 +24,7 @@ const SleepScreen = () => {
   const [sleepDisruptions, setSleepDisruptions] = useState('');
   const [notes, setNotes] = useState('');
 
-  const handleLogSleep = () => {
+  const handleLogSleep = async () => {
     const hours = parseFloat(hoursSlept);
     
     if (!selectedDate || !hoursSlept || isNaN(hours)) {
@@ -36,28 +37,32 @@ const SleepScreen = () => {
       return;
     }
 
-    addSleepLog({
-      date: selectedDate,
-      hoursSlept: hours,
-      sleepQuality,
-      morningSymptoms: {
-        nausea,
-        fatigue,
-        pain,
-      },
-      sleepDisruptions: sleepDisruptions.trim(),
-      notes: notes.trim(),
-    });
+    try {
+      await addSleepLog({
+        date: selectedDate,
+        hoursSlept: hours,
+        sleepQuality,
+        morningSymptoms: {
+          nausea,
+          fatigue,
+          pain,
+        },
+        sleepDisruptions: sleepDisruptions.trim(),
+        notes: notes.trim(),
+      });
 
-    // Reset form
-    setHoursSlept('');
-    setSleepQuality(1);
-    setNausea(1);
-    setFatigue(1);
-    setPain(1);
-    setSleepDisruptions('');
-    setNotes('');
-    Alert.alert('Success', 'Sleep log added successfully!');
+      // Reset form
+      setHoursSlept('');
+      setSleepQuality(1);
+      setNausea(1);
+      setFatigue(1);
+      setPain(1);
+      setSleepDisruptions('');
+      setNotes('');
+      Alert.alert('Success', 'Sleep log added successfully!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to add sleep log. Please try again.');
+    }
   };
 
   const getSleepInsights = () => {
@@ -72,19 +77,19 @@ const SleepScreen = () => {
     let insight = '';
     
     if (avgHours < 6) {
-      insight += '⚠️ Getting less than 6 hours of sleep regularly. Poor sleep can worsen endometriosis symptoms. ';
+      insight += 'Getting less than 6 hours of sleep regularly. Poor sleep can worsen endometriosis symptoms. ';
     } else if (avgHours > 9) {
-      insight += '💤 Sleeping more than 9 hours regularly may indicate fatigue from symptoms. ';
+      insight += 'Sleeping more than 9 hours regularly may indicate fatigue from symptoms. ';
     } else {
-      insight += '✅ Sleep duration appears healthy (6-9 hours). ';
+      insight += 'Sleep duration appears healthy (6-9 hours). ';
     }
     
     if (avgQuality < 4) {
-      insight += '😴 Low sleep quality detected. Consider sleep hygiene improvements. ';
+      insight += 'Low sleep quality detected. Consider sleep hygiene improvements. ';
     }
     
     if (avgMorningPain > 5) {
-      insight += '🌅 High morning pain levels may be disrupting sleep recovery. ';
+      insight += 'High morning pain levels may be disrupting sleep recovery. ';
     }
     
     // Check for disruption patterns
@@ -93,7 +98,7 @@ const SleepScreen = () => {
     ).length;
     
     if (disruptedNights > recentLogs.length / 2) {
-      insight += '📊 Pain is frequently disrupting your sleep. Consider discussing pain management with your healthcare provider.';
+      insight += 'Pain is frequently disrupting your sleep. Consider discussing pain management with your healthcare provider.';
     }
     
     return insight || 'Sleep patterns appear stable. Keep tracking for better insights.';
@@ -112,9 +117,14 @@ const SleepScreen = () => {
   const avgStats = getAverageStats();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Sleep Tracker</Text>
-      <Text style={styles.subheader}>Monitor sleep quality and morning symptoms</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#9AE6E0" />
+      <View style={styles.headerContainer}>
+        <View style={styles.headerGradient}>
+          <Text style={styles.header}>Sleep Tracker</Text>
+          <Text style={styles.subheader}>Monitor sleep quality and morning symptoms</Text>
+        </View>
+      </View>
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Sleep Stats */}
@@ -137,11 +147,11 @@ const SleepScreen = () => {
         {/* Date Selection */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Date</Text>
-          <TextInput
-            style={styles.dateInput}
+          <DatePickerInput
             value={selectedDate}
-            onChangeText={setSelectedDate}
-            placeholder="YYYY-MM-DD"
+            onDateChange={setSelectedDate}
+            themeColor="#9AE6E0"
+            placeholder="Select sleep date"
           />
         </View>
 
@@ -168,7 +178,7 @@ const SleepScreen = () => {
             label="Sleep Quality"
             value={sleepQuality}
             onValueChange={setSleepQuality}
-            color="#DEB887"
+            color="#9AE6E0"
             description="1 = Terrible sleep, 10 = Perfect sleep"
           />
         </View>
@@ -209,7 +219,7 @@ const SleepScreen = () => {
           <Text style={styles.insightText}>{getSleepInsights()}</Text>
           {/* TODO: Add sleep pattern graphs, bedtime tracking */}
           <Text style={styles.futureFeature}>
-            📈 Coming soon: Sleep pattern visualization, bedtime tracking, and correlation with symptom flares
+            Coming soon: Sleep pattern visualization, bedtime tracking, and correlation with symptom flares
           </Text>
         </View>
 
@@ -253,37 +263,56 @@ const SleepScreen = () => {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FEFEFE',
+    backgroundColor: '#F2F9F8',
+  },
+  headerContainer: {
+    marginBottom: 0,
+  },
+  headerGradient: {
+    backgroundColor: '#9AE6E0',
+    paddingTop: 60,
+    paddingBottom: 25,
     paddingHorizontal: 20,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+    shadowColor: '#9AE6E0',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 5,
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subheader: {
     fontSize: 16,
-    color: '#7F8C8D',
-    marginBottom: 20,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    opacity: 0.9,
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   statsContainer: {
-    backgroundColor: '#F5F5DC',
+    backgroundColor: '#EBF8F7',
     padding: 20,
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#DEB887',
+    borderLeftColor: '#9AE6E0',
   },
   statsTitle: {
     fontSize: 16,
@@ -305,7 +334,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#DEB887',
+    color: '#9AE6E0',
   },
   statLabel: {
     fontSize: 12,
@@ -361,7 +390,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   logButton: {
-    backgroundColor: '#DEB887',
+    backgroundColor: '#9AE6E0',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -373,12 +402,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   insightCard: {
-    backgroundColor: '#F5F5DC',
+    backgroundColor: '#EBF8F7',
     padding: 20,
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#DEB887',
+    borderLeftColor: '#9AE6E0',
   },
   insightTitle: {
     fontSize: 16,
@@ -409,7 +438,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#DEB887',
+    borderLeftColor: '#9AE6E0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -432,7 +461,7 @@ const styles = StyleSheet.create({
   },
   sleepHours: {
     fontSize: 16,
-    color: '#DEB887',
+    color: '#9AE6E0',
     fontWeight: '600',
   },
   sleepQuality: {
@@ -446,7 +475,7 @@ const styles = StyleSheet.create({
   },
   logDisruptions: {
     fontSize: 14,
-    color: '#FF8E53',
+    color: '#9AE6E0',
     marginBottom: 4,
   },
   logNotes: {
