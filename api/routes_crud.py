@@ -1,101 +1,105 @@
 # api/routes_crud.py
-
 from fastapi import APIRouter, HTTPException
+from sqlmodel import Session, select
+from datetime import datetime
+from api.db import engine, Sleep, Diet, Menstrual, Symptoms
 from pydantic import BaseModel
-from api.supabase_client import supabase
 
 router = APIRouter()
 
 # --- Sleep CRUD ---
 class InsertSleep(BaseModel):
-    date: str          # ISO 8601 datetime
-    duration: float    # hours
-    quality: int       # 0-10 scale
-    disruptions: str   # e.g., "2 awakenings"
-    notes: str
+    date:    datetime
+    duration: float
+    quality:  int
+    disruptions: str
+    notes:      str
 
 @router.post("/insert_sleep")
-async def insert_sleep(payload: InsertSleep):
-    try:
-        supabase.table("sleep").insert(payload.model_dump()).execute()
-        return {"status": "ok"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def insert_sleep(payload: InsertSleep):
+    with Session(engine) as session:
+        record = Sleep(**payload.dict())
+        session.add(record)
+        session.commit()
+        session.refresh(record)
+        return record  # returns the full Sleep ORM instance
 
 @router.get("/get_all_sleep")
-async def get_all_sleep():
-    try:
-        data = supabase.table("sleep").select("*").execute().data
-        return data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def get_all_sleep():
+    with Session(engine) as session:
+        records = session.exec(select(Sleep).order_by(Sleep.date.desc())).all()
+        return records
 
 # --- Diet CRUD ---
 class InsertDiet(BaseModel):
-    meal: str         # breakfast, lunch, dinner, etc.
-    date: str         # ISO 8601 datetime
-    items: list[str]  # list of food items
+    meal: str
+    date: datetime
+    items: list[str]
     notes: str
 
 @router.post("/insert_diet")
-async def insert_diet(payload: InsertDiet):
-    try:
-        supabase.table("diet").insert(payload.model_dump()).execute()
-        return {"status": "ok"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def insert_diet(payload: InsertDiet):
+    items_csv = ",".join(payload.items)
+    record = Diet(
+        meal=payload.meal,
+        date=payload.date,
+        items=items_csv,
+        notes=payload.notes
+    )
+    with Session(engine) as session:
+        session.add(record)
+        session.commit()
+        session.refresh(record)
+        return record
 
 @router.get("/get_all_diet")
-async def get_all_diet():
-    try:
-        data = supabase.table("diet").select("*").execute().data
-        return data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def get_all_diet():
+    with Session(engine) as session:
+        records = session.exec(select(Diet).order_by(Diet.date.desc())).all()
+        # convert items CSV back to list
+        for r in records:
+            r.items = r.items.split(",") if isinstance(r.items, str) else []
+        return records
 
 # --- Menstrual CRUD ---
 class InsertMenstrual(BaseModel):
-    period_event: str  # "start" or "end"
-    date: str          # ISO 8601 datetime
-    flow_level: str    # low, moderate, heavy
+    period_event: str
+    date: datetime
+    flow_level: str | None
     notes: str
 
 @router.post("/insert_menstrual")
-async def insert_menstrual(payload: InsertMenstrual):
-    try:
-        supabase.table("menstrual").insert(payload.model_dump()).execute()
-        return {"status": "ok"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def insert_menstrual(payload: InsertMenstrual):
+    record = Menstrual(**payload.dict())
+    with Session(engine) as session:
+        session.add(record)
+        session.commit()
+        session.refresh(record)
+        return record
 
 @router.get("/get_all_menstrual")
-async def get_all_menstrual():
-    try:
-        data = supabase.table("menstrual").select("*").execute().data
-        return data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def get_all_menstrual():
+    with Session(engine) as session:
+        return session.exec(select(Menstrual).order_by(Menstrual.date.desc())).all()
 
 # --- Symptoms CRUD ---
 class InsertSymptoms(BaseModel):
-    date: str     # ISO 8601 datetime
-    nausea: int   # 0-10 scale
-    fatigue: int  # 0-10 scale
-    pain: int     # 0-10 scale
-    notes: str
+    date: datetime
+    nausea:  int
+    fatigue: int
+    pain:    int
+    notes:   str
 
 @router.post("/insert_symptoms")
-async def insert_symptoms(payload: InsertSymptoms):
-    try:
-        supabase.table("symptoms").insert(payload.model_dump()).execute()
-        return {"status": "ok"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def insert_symptoms(payload: InsertSymptoms):
+    record = Symptoms(**payload.dict())
+    with Session(engine) as session:
+        session.add(record)
+        session.commit()
+        session.refresh(record)
+        return record
 
 @router.get("/get_all_symptoms")
-async def get_all_symptoms():
-    try:
-        data = supabase.table("symptoms").select("*").execute().data
-        return data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def get_all_symptoms():
+    with Session(engine) as session:
+        return session.exec(select(Symptoms).order_by(Symptoms.date.desc())).all()
