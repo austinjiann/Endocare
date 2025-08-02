@@ -1,14 +1,13 @@
 from pathlib import Path
-REPO_ROOT = Path(__file__).resolve().parents[1]
-MODEL_PATH = REPO_ROOT / 'models' / 'flare_xgb.pkl'
-model = joblib.load(MODEL_PATH)
-
-
 from fastapi import FastAPI
 from pydantic import BaseModel
-import joblib, numpy as np, pathlib
+import numpy as np          # already there
+import joblib               # ← ADD THIS LINE
 
-model = joblib.load(pathlib.Path(__file__).resolve().parents[1] / 'models' / 'flare_xgb.pkl')
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MODEL_PATH = REPO_ROOT / "models" / "flare_xgb.pkl"
+model = joblib.load(MODEL_PATH)
+
 app = FastAPI()
 
 class Features(BaseModel):
@@ -18,5 +17,5 @@ class Features(BaseModel):
 @app.post("/predict-flare")
 def predict(f: Features):
     X = np.array([[f.duration_h, f.quality_pct]])
-    prob = float(model.predict_proba(X)[0,1])
+    prob = float(model.predict_proba(X)[0, 1])
     return {"flareProbability": round(prob, 3)}
