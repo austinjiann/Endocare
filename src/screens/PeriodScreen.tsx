@@ -149,37 +149,7 @@ const PeriodScreen = () => {
           </View>
         )}
 
-        {/* Associated Symptoms */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Symptoms During Period</Text>
-          <Text style={styles.sectionSubtitle}>
-            Rate symptoms you're experiencing (1-10 scale)
-          </Text>
-          
-          <SymptomSlider
-            label="Nausea"
-            value={nausea}
-            onValueChange={setNausea}
-            color="#FF6B9D"
-            description="Feeling sick or queasy"
-          />
-          
-          <SymptomSlider
-            label="Fatigue"
-            value={fatigue}
-            onValueChange={setFatigue}
-            color="#4ECDC4"
-            description="Tiredness and low energy"
-          />
-          
-          <SymptomSlider
-            label="Pain"
-            value={pain}
-            onValueChange={setPain}
-            color="#FF8E53"
-            description="Cramping, back pain, or general discomfort"
-          />
-        </View>
+        
 
         {/* Notes */}
         <View style={styles.section}>

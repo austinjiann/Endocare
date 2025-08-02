@@ -152,64 +152,11 @@ const FoodScreen = () => {
           />
         </View>
 
-        {/* Flare-up Score */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Flare-up Severity</Text>
-          <Text style={styles.sectionSubtitle}>
-            Rate how much this meal triggered symptoms (1-10)
-          </Text>
-          
-          <SymptomSlider
-            label="Flare-up Score"
-            value={flareUpScore}
-            onValueChange={setFlareUpScore}
-            color="#FF8E53"
-            description="1 = No reaction, 10 = Severe flare-up"
-          />
-        </View>
+        
 
-        {/* Symptoms After Eating */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Symptoms After Eating</Text>
-          <Text style={styles.sectionSubtitle}>
-            Rate symptoms experienced after this meal
-          </Text>
-          
-          <SymptomSlider
-            label="Nausea"
-            value={nausea}
-            onValueChange={setNausea}
-            color="#FF6B9D"
-            description="Feeling sick or queasy"
-          />
-          
-          <SymptomSlider
-            label="Fatigue"
-            value={fatigue}
-            onValueChange={setFatigue}
-            color="#4ECDC4"
-            description="Tiredness or energy drop"
-          />
-          
-          <SymptomSlider
-            label="Pain"
-            value={pain}
-            onValueChange={setPain}
-            color="#FF8E53"
-            description="Abdominal pain or cramping"
-          />
-        </View>
+        
 
-        {/* Time After Eating */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Time When Symptoms Started</Text>
-          <TextInput
-            style={styles.timeInput}
-            value={timeAfterEating}
-            onChangeText={setTimeAfterEating}
-            placeholder="e.g., 30 minutes, 2 hours, next day..."
-          />
-        </View>
+        
 
         {/* Notes */}
         <View style={styles.section}>

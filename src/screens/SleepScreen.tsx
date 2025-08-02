@@ -173,38 +173,7 @@ const SleepScreen = () => {
           />
         </View>
 
-        {/* Morning Symptoms */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Morning Symptoms</Text>
-          <Text style={styles.sectionSubtitle}>
-            How did you feel when you woke up?
-          </Text>
-          
-          <SymptomSlider
-            label="Nausea"
-            value={nausea}
-            onValueChange={setNausea}
-            color="#FF6B9D"
-            description="Morning nausea or queasiness"
-          />
-          
-          <SymptomSlider
-            label="Fatigue"
-            value={fatigue}
-            onValueChange={setFatigue}
-            color="#4ECDC4"
-            description="How tired you felt upon waking"
-          />
-          
-          <SymptomSlider
-            label="Pain"
-            value={pain}
-            onValueChange={setPain}
-            color="#FF8E53"
-            description="Pain levels when waking up"
-          />
-        </View>
-
+        
         {/* Sleep Disruptions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Sleep Disruptions</Text>
