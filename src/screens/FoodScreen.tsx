@@ -92,7 +92,7 @@ const FoodScreen = () => {
     <TouchableOpacity
       style={[
         styles.mealTypeButton,
-        mealType === type && { ...styles.mealTypeButtonSelected, backgroundColor: '#FFB3CE' }
+        mealType === type && { ...styles.mealTypeButtonSelected, backgroundColor: '#A8D5BA' }
       ]}
       onPress={() => setMealType(type)}
     >
@@ -137,7 +137,7 @@ const FoodScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#FFB3CE" />
+      <StatusBar barStyle="light-content" backgroundColor="#A8D5BA" />
       <View style={styles.headerContainer}>
         <View style={styles.headerGradient}>
           <Text style={styles.header}>Food Tracker</Text>
@@ -152,7 +152,7 @@ const FoodScreen = () => {
           <DatePickerInput
             value={selectedDate}
             onDateChange={setSelectedDate}
-            themeColor="#FFB3CE"
+            themeColor="#A8D5BA"
             placeholder="Select meal date"
           />
         </View>
@@ -278,19 +278,19 @@ const getScoreColor = (score: number): string => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF4F8',
+    backgroundColor: '#F4FBF6',
   },
   headerContainer: {
     marginBottom: 0,
   },
   headerGradient: {
-    backgroundColor: '#FFB3CE',
+    backgroundColor: '#A8D5BA',
     paddingTop: 60,
     paddingBottom: 25,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 35,
     borderBottomRightRadius: 35,
-    shadowColor: '#FFB3CE',
+    shadowColor: '#A8D5BA',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FF6B9D',
+    color: '#6BBF59',
     marginBottom: 15,
   },
   sectionSubtitle: {
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   },
   mealTypeButtonSelected: {
     borderColor: 'transparent',
-    shadowColor: '#FFB3CE',
+    shadowColor: '#A8D5BA',
     shadowOpacity: 0.3,
     elevation: 4,
   },
@@ -423,12 +423,12 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   logButton: {
-    backgroundColor: '#FFB3CE',
+    backgroundColor: '#A8D5BA',
     padding: 20,
     borderRadius: 15,
     alignItems: 'center',
     marginBottom: 30,
-    shadowColor: '#FFB3CE',
+    shadowColor: '#A8D5BA',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
@@ -440,11 +440,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   insightCard: {
-    backgroundColor: '#FFB3CE',
+    backgroundColor: '#A8D5BA',
     padding: 25,
     borderRadius: 20,
     marginBottom: 30,
-    shadowColor: '#FFB3CE',
+    shadowColor: '#A8D5BA',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#FFB3CE',
+    borderLeftColor: '#A8D5BA',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   mealTypeBadgeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FF6B9D',
+    color: '#6BBF59',
   },
   logFood: {
     fontSize: 14,
