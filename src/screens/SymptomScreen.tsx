@@ -20,26 +20,30 @@ const SymptomScreen = () => {
   const [pain, setPain] = useState(1);
   const [notes, setNotes] = useState('');
 
-  const handleLogSymptoms = () => {
+  const handleLogSymptoms = async () => {
     if (!selectedDate) {
       Alert.alert('Error', 'Please select a date');
       return;
     }
 
-    addSymptomLog({
-      date: selectedDate,
-      nausea,
-      fatigue,
-      pain,
-      notes: notes.trim(),
-    });
+    try {
+      await addSymptomLog({
+        date: selectedDate,
+        nausea,
+        fatigue,
+        pain,
+        notes: notes.trim(),
+      });
 
-    // Reset form
-    setNausea(1);
-    setFatigue(1);
-    setPain(1);
-    setNotes('');
-    Alert.alert('Success', 'Symptoms logged successfully!');
+      // Reset form
+      setNausea(1);
+      setFatigue(1);
+      setPain(1);
+      setNotes('');
+      Alert.alert('Success', 'Symptoms logged successfully!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to log symptoms. Please try again.');
+    }
   };
 
   const getSymptomInsight = () => {
@@ -95,7 +99,7 @@ const SymptomScreen = () => {
             label="Fatigue"
             value={fatigue}
             onValueChange={setFatigue}
-            color="#4ECDC4"
+            color="#E91E63"
             description="Tiredness, exhaustion, lack of energy"
           />
           
@@ -103,7 +107,7 @@ const SymptomScreen = () => {
             label="Pain"
             value={pain}
             onValueChange={setPain}
-            color="#FF8E53"
+            color="#FF6B9D"
             description="Cramping, aching, sharp or dull pain"
           />
         </View>
@@ -153,12 +157,12 @@ const SymptomScreen = () => {
                       </Text>
                     </View>
                     <View style={styles.symptomBadge}>
-                      <Text style={[styles.symptomBadgeText, { color: '#4ECDC4' }]}>
+                      <Text style={[styles.symptomBadgeText, { color: '#E91E63' }]}>
                         F: {log.fatigue}
                       </Text>
                     </View>
                     <View style={styles.symptomBadge}>
-                      <Text style={[styles.symptomBadgeText, { color: '#FF8E53' }]}>
+                      <Text style={[styles.symptomBadgeText, { color: '#FF6B9D' }]}>
                         P: {log.pain}
                       </Text>
                     </View>
@@ -229,7 +233,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   logButton: {
-    backgroundColor: '#9370DB',
+    backgroundColor: '#FF6B9D',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -241,12 +245,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   insightCard: {
-    backgroundColor: '#F3E5F5',
+    backgroundColor: '#FFE5F1',
     padding: 20,
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#9370DB',
+    borderLeftColor: '#FF6B9D',
   },
   insightTitle: {
     fontSize: 16,
@@ -277,7 +281,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#9370DB',
+    borderLeftColor: '#FF6B9D',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,

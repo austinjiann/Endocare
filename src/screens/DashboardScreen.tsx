@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
-import QuickSymptomLogger from '../components/QuickSymptomLogger';
+import PredictionSummaryBoard from '../components/PredictionSummaryBoard';
 
 const DashboardScreen = ({ navigation }: any) => {
-  const { state } = useEndoCare();
+  const { state, syncWithBackend } = useEndoCare();
 
   // Get recent data for overview cards
   const recentSymptomLog = state.symptomLogs[state.symptomLogs.length - 1];
@@ -66,13 +66,13 @@ const DashboardScreen = ({ navigation }: any) => {
           <Text style={styles.symptomLabel}>Nausea</Text>
         </View>
         <View style={styles.symptomItem}>
-          <Text style={[styles.symptomValue, { color: '#4ECDC4' }]}>
+          <Text style={[styles.symptomValue, { color: '#E91E63' }]}>
             {avgSymptoms.fatigue}
           </Text>
           <Text style={styles.symptomLabel}>Fatigue</Text>
         </View>
         <View style={styles.symptomItem}>
-          <Text style={[styles.symptomValue, { color: '#FF8E53' }]}>
+          <Text style={[styles.symptomValue, { color: '#FF6B9D' }]}>
             {avgSymptoms.pain}
           </Text>
           <Text style={styles.symptomLabel}>Pain</Text>
@@ -83,12 +83,36 @@ const DashboardScreen = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>EndoCare</Text>
-      <Text style={styles.subheader}>Managing endometriosis together</Text>
+      <View style={styles.headerContainer}>
+        <View>
+          <Text style={styles.header}>EndoCare</Text>
+          <Text style={styles.subheader}>Managing endometriosis together</Text>
+        </View>
+        <View style={styles.statusContainer}>
+          {state.isLoading && <ActivityIndicator size="small" color="#FF6B9D" />}
+          <View style={[styles.statusDot, { 
+            backgroundColor: 
+              state.connectionStatus === 'online' ? '#E91E63' : 
+              state.connectionStatus === 'checking' || state.connectionStatus === 'retrying' ? '#FF6B9D' : 
+              '#FF6B9D' 
+          }]} />
+          <Text style={styles.statusText}>
+            {state.connectionStatus === 'online' ? 'Online' : 
+             state.connectionStatus === 'checking' ? 'Checking...' :
+             state.connectionStatus === 'retrying' ? 'Connecting...' :
+             'Offline'}
+          </Text>
+          {state.connectionStatus === 'offline' && (
+            <TouchableOpacity onPress={syncWithBackend} style={styles.retryButton}>
+              <Text style={styles.retryText}>Retry</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Quick symptom logger */}
-        <QuickSymptomLogger />
+        {/* Prediction and summary board */}
+        <PredictionSummaryBoard />
         
         {/* Symptom overview */}
         <SymptomOverviewCard />
@@ -113,7 +137,7 @@ const DashboardScreen = ({ navigation }: any) => {
             `Last meal: ${recentFoodLog.foodItems.substring(0, 30)}...` : 
             'Track potential trigger foods'
           }
-          backgroundColor="#E8F4FD"
+          backgroundColor="#FFE5F1"
           iconText="🍽️"
           onPress={() => navigation.navigate('Food')}
         />
@@ -124,7 +148,7 @@ const DashboardScreen = ({ navigation }: any) => {
             `Last night: ${recentSleepLog.hoursSlept}h (${recentSleepLog.sleepQuality}/10)` : 
             'Monitor sleep quality'
           }
-          backgroundColor="#F5F5DC"
+          backgroundColor="#FFE5F1"
           iconText="😴"
           onPress={() => navigation.navigate('Sleep')}
         />
@@ -172,6 +196,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEFEFE',
     paddingHorizontal: 20,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusText: {
+    fontSize: 12,
+    color: '#7F8C8D',
+    fontWeight: '500',
+  },
+  retryButton: {
+    backgroundColor: '#F8F9FA',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  retryText: {
+    fontSize: 11,
+    color: '#FFF',
+    fontWeight: '600',
+  },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -192,7 +249,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#9370DB',
+    borderLeftColor: '#FF6B9D',
   },
   overviewTitle: {
     fontSize: 16,
@@ -251,7 +308,7 @@ const styles = StyleSheet.create({
     color: '#7F8C8D',
   },
   detailedSymptomButton: {
-    backgroundColor: '#9370DB',
+    backgroundColor: '#FF6B9D',
     padding: 20,
     borderRadius: 15,
     alignItems: 'center',

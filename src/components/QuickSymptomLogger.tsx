@@ -80,14 +80,14 @@ const QuickSymptomLogger: React.FC = () => {
         label="Fatigue"
         value={fatigue}
         onValueChange={setFatigue}
-        color="#4ECDC4"
+        color="#E91E63"
       />
       
       <QuickSlider
         label="Pain"
         value={pain}
         onValueChange={setPain}
-        color="#FF8E53"
+        color="#FF6B9D"
       />
       
       <TouchableOpacity style={styles.logButton} onPress={handleQuickLog}>
@@ -99,7 +99,7 @@ const QuickSymptomLogger: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F3E5F5',
+    backgroundColor: '#FFE5F1',
     padding: 20,
     borderRadius: 15,
     marginBottom: 20,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     color: '#2C3E50',
   },
   logButton: {
-    backgroundColor: '#9370DB',
+    backgroundColor: '#FF6B9D',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
