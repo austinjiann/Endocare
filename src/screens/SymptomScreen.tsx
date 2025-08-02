@@ -11,6 +11,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import SymptomSlider from '../components/SymptomSlider';
+// FIX: Removed unused imports. The EndoCareContext is handling data persistence.
+// import { insertSleep, getAllSleep } from "../services/api";
 
 const SymptomScreen = () => {
   const { state, addSymptomLog } = useEndoCare();
@@ -99,6 +101,7 @@ const SymptomScreen = () => {
             label="Fatigue"
             value={fatigue}
             onValueChange={setFatigue}
+            // FIX: Using a slightly different color for fatigue for visual distinction
             color="#E91E63"
             description="Tiredness, exhaustion, lack of energy"
           />

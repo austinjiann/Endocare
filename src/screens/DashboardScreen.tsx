@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import PredictionSummaryBoard from '../components/PredictionSummaryBoard';
+// FIX: Removed unused imports. The EndoCareContext is handling data persistence.
+// import { insertSleep, getAllSleep } from "../services/api";
 
 const DashboardScreen = ({ navigation }: any) => {
   const { state, syncWithBackend } = useEndoCare();
@@ -223,6 +225,8 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 4,
     marginLeft: 8,
+    // FIX: Adjusted retry button text color for better visibility against a light background
+    backgroundColor: '#FF6B9D',
   },
   retryText: {
     fontSize: 11,

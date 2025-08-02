@@ -13,6 +13,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "extra": {
+      "apiUrl": "http://127.0.0.1:8000"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.endocare.app"

@@ -55,11 +55,11 @@ def insert_diet(payload: InsertDiet):
 @router.get("/get_all_diet")
 def get_all_diet():
     with Session(engine) as session:
-        records = session.exec(select(Diet).order_by(Diet.date.desc())).all()
-        # convert items CSV back to list
-        for r in records:
+        rows = session.exec(select(Diet).order_by(Diet.date.desc())).all()
+        for r in rows:
+            # Convert CSV → array
             r.items = r.items.split(",") if isinstance(r.items, str) else []
-        return records
+        return rows
 
 # --- Menstrual CRUD ---
 class InsertMenstrual(BaseModel):

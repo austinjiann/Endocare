@@ -11,6 +11,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import SymptomSlider from '../components/SymptomSlider';
+// FIX: Removed unused imports. The EndoCareContext is handling data persistence.
+// import { insertSleep, getAllSleep } from "../services/api";
+
 
 const FoodScreen = () => {
   const { state, addFoodLog } = useEndoCare();
@@ -168,10 +171,55 @@ const FoodScreen = () => {
           />
         </View>
 
-        
+        {/* FIX: Added Symptom Sliders for flare-up score and symptoms */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Symptom Flare-up</Text>
+          <Text style={styles.sectionSubtitle}>Rate symptoms after eating (1-10 scale)</Text>
+          
+          <SymptomSlider
+            label="Overall Flare-up Score"
+            value={flareUpScore}
+            onValueChange={setFlareUpScore}
+            color="#FF6B9D"
+            description="1 = No symptoms, 10 = Severe flare-up"
+          />
 
+          <SymptomSlider
+            label="Nausea"
+            value={nausea}
+            onValueChange={setNausea}
+            color="#FF6B9D"
+            description="1 = No nausea, 10 = Severe nausea"
+          />
+          <SymptomSlider
+            label="Fatigue"
+            value={fatigue}
+            onValueChange={setFatigue}
+            color="#FF6B9D"
+            description="1 = Energized, 10 = Exhausted"
+          />
+          <SymptomSlider
+            label="Pain"
+            value={pain}
+            onValueChange={setPain}
+            color="#FF6B9D"
+            description="1 = No pain, 10 = Severe pain"
+          />
+        </View>
         
-
+        {/* FIX: Added TextInput for time after eating */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Time to Symptoms</Text>
+          <Text style={styles.sectionSubtitle}>
+            How long after eating did symptoms appear?
+          </Text>
+          <TextInput
+            style={styles.timeInput}
+            value={timeAfterEating}
+            onChangeText={setTimeAfterEating}
+            placeholder="e.g., 30 minutes, 2 hours..."
+          />
+        </View>
         
 
         {/* Notes */}

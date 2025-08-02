@@ -12,6 +12,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import SymptomSlider from '../components/SymptomSlider';
 
+// We’re using the EndoCareContext’s addSleepLog under the hood,
+// so no need to import insertSleep/getAllSleep directly here.
+
+
 const SleepScreen = () => {
   const { state, addSleepLog } = useEndoCare();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -36,19 +40,15 @@ const SleepScreen = () => {
       return;
     }
 
-    try {
+   try {
+      // match the InsertSleepRequest type exactly:
       await addSleepLog({
-        date: selectedDate,
-        hoursSlept: hours,
-        sleepQuality,
-        morningSymptoms: {
-          nausea,
-          fatigue,
-          pain,
-        },
-        sleepDisruptions: sleepDisruptions.trim(),
-        notes: notes.trim(),
-      });
+        date:        selectedDate,
+        duration:    hours,           // formerly `hoursSlept`
+        quality:     sleepQuality,    // formerly `sleepQuality`
+        disruptions: sleepDisruptions.trim(),
+        notes:       notes.trim(),
+    });
 
       // Reset form
       setHoursSlept('');
@@ -228,10 +228,8 @@ const SleepScreen = () => {
                 <View style={styles.logHeader}>
                   <Text style={styles.logDate}>{log.date}</Text>
                   <View style={styles.sleepMetrics}>
-                    <Text style={styles.sleepHours}>{log.hoursSlept}h</Text>
-                    <Text style={styles.sleepQuality}>
-                      Quality: {log.sleepQuality}/10
-                    </Text>
+                    <Text style={styles.sleepHours}>{log.duration}h</Text>
+                    <Text style={styles.sleepQuality}>Quality: {log.quality}/10</Text>
                   </View>
                 </View>
                 

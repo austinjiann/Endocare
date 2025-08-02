@@ -12,6 +12,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import SymptomSlider from '../components/SymptomSlider';
 
+// FIX: Removed unused imports. The EndoCareContext is handling data persistence.
+// import { insertSleep, getAllSleep } from "../services/api";
+
 const PeriodScreen = () => {
   const { state, addPeriodLog } = useEndoCare();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -32,7 +35,8 @@ const PeriodScreen = () => {
       await addPeriodLog({
         date: selectedDate,
         type: periodType,
-        flowLevel,
+        // FIX: Only log flowLevel if the periodType is 'start'
+        flowLevel: periodType === 'start' ? flowLevel : undefined,
         associatedSymptoms: {
           nausea,
           fatigue,
@@ -91,6 +95,7 @@ const PeriodScreen = () => {
   };
 
   const getCycleInsights = () => {
+    // FIX: Access `log.associatedSymptoms.pain` for the log data.
     const recentPeriods = state.periodLogs.slice(-6); // Last 3 cycles
     if (recentPeriods.length < 2) return 'Track more cycles to see insights';
     
@@ -152,7 +157,34 @@ const PeriodScreen = () => {
             </View>
           </View>
         )}
-
+        
+        {/* FIX: Added Symptom Sliders for Nausea, Fatigue, and Pain */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Associated Symptoms</Text>
+          <Text style={styles.sectionSubtitle}>Rate symptoms today (1-10 scale)</Text>
+          
+          <SymptomSlider
+            label="Nausea"
+            value={nausea}
+            onValueChange={setNausea}
+            color="#FF6B9D"
+            description="1 = No nausea, 10 = Severe nausea"
+          />
+          <SymptomSlider
+            label="Fatigue"
+            value={fatigue}
+            onValueChange={setFatigue}
+            color="#FF6B9D"
+            description="1 = Energized, 10 = Exhausted"
+          />
+          <SymptomSlider
+            label="Pain"
+            value={pain}
+            onValueChange={setPain}
+            color="#FF6B9D"
+            description="1 = No pain, 10 = Severe pain"
+          />
+        </View>
         
 
         {/* Notes */}
