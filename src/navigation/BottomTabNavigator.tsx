@@ -24,7 +24,7 @@ export default function BottomTabNavigator() {
           paddingBottom: Platform.OS === 'ios' ? 20 : 10,
           paddingTop: 10,
         },
-        tabBarActiveTintColor: '#9370DB',
+        tabBarActiveTintColor: '#FF6B9D',
         tabBarInactiveTintColor: '#7F8C8D',
         tabBarLabelStyle: {
           fontSize: 12,

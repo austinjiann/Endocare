@@ -23,7 +23,7 @@ const SleepScreen = () => {
   const [sleepDisruptions, setSleepDisruptions] = useState('');
   const [notes, setNotes] = useState('');
 
-  const handleLogSleep = () => {
+  const handleLogSleep = async () => {
     const hours = parseFloat(hoursSlept);
     
     if (!selectedDate || !hoursSlept || isNaN(hours)) {
@@ -36,28 +36,32 @@ const SleepScreen = () => {
       return;
     }
 
-    addSleepLog({
-      date: selectedDate,
-      hoursSlept: hours,
-      sleepQuality,
-      morningSymptoms: {
-        nausea,
-        fatigue,
-        pain,
-      },
-      sleepDisruptions: sleepDisruptions.trim(),
-      notes: notes.trim(),
-    });
+    try {
+      await addSleepLog({
+        date: selectedDate,
+        hoursSlept: hours,
+        sleepQuality,
+        morningSymptoms: {
+          nausea,
+          fatigue,
+          pain,
+        },
+        sleepDisruptions: sleepDisruptions.trim(),
+        notes: notes.trim(),
+      });
 
-    // Reset form
-    setHoursSlept('');
-    setSleepQuality(1);
-    setNausea(1);
-    setFatigue(1);
-    setPain(1);
-    setSleepDisruptions('');
-    setNotes('');
-    Alert.alert('Success', 'Sleep log added successfully!');
+      // Reset form
+      setHoursSlept('');
+      setSleepQuality(1);
+      setNausea(1);
+      setFatigue(1);
+      setPain(1);
+      setSleepDisruptions('');
+      setNotes('');
+      Alert.alert('Success', 'Sleep log added successfully!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to add sleep log. Please try again.');
+    }
   };
 
   const getSleepInsights = () => {
@@ -168,7 +172,7 @@ const SleepScreen = () => {
             label="Sleep Quality"
             value={sleepQuality}
             onValueChange={setSleepQuality}
-            color="#DEB887"
+            color="#FF6B9D"
             description="1 = Terrible sleep, 10 = Perfect sleep"
           />
         </View>
@@ -278,12 +282,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statsContainer: {
-    backgroundColor: '#F5F5DC',
+    backgroundColor: '#FFE5F1',
     padding: 20,
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#DEB887',
+    borderLeftColor: '#FF6B9D',
   },
   statsTitle: {
     fontSize: 16,
@@ -305,7 +309,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#DEB887',
+    color: '#FF6B9D',
   },
   statLabel: {
     fontSize: 12,
@@ -361,7 +365,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   logButton: {
-    backgroundColor: '#DEB887',
+    backgroundColor: '#FF6B9D',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -373,12 +377,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   insightCard: {
-    backgroundColor: '#F5F5DC',
+    backgroundColor: '#FFE5F1',
     padding: 20,
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#DEB887',
+    borderLeftColor: '#FF6B9D',
   },
   insightTitle: {
     fontSize: 16,
@@ -409,7 +413,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#DEB887',
+    borderLeftColor: '#FF6B9D',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -432,7 +436,7 @@ const styles = StyleSheet.create({
   },
   sleepHours: {
     fontSize: 16,
-    color: '#DEB887',
+    color: '#FF6B9D',
     fontWeight: '600',
   },
   sleepQuality: {
@@ -446,7 +450,7 @@ const styles = StyleSheet.create({
   },
   logDisruptions: {
     fontSize: 14,
-    color: '#FF8E53',
+    color: '#FF6B9D',
     marginBottom: 4,
   },
   logNotes: {

@@ -22,31 +22,35 @@ const PeriodScreen = () => {
   const [pain, setPain] = useState(1);
   const [notes, setNotes] = useState('');
 
-  const handleLogPeriod = () => {
+  const handleLogPeriod = async () => {
     if (!selectedDate) {
       Alert.alert('Error', 'Please select a date');
       return;
     }
 
-    addPeriodLog({
-      date: selectedDate,
-      type: periodType,
-      flowLevel,
-      associatedSymptoms: {
-        nausea,
-        fatigue,
-        pain,
-      },
-      notes: notes.trim(),
-    });
+    try {
+      await addPeriodLog({
+        date: selectedDate,
+        type: periodType,
+        flowLevel,
+        associatedSymptoms: {
+          nausea,
+          fatigue,
+          pain,
+        },
+        notes: notes.trim(),
+      });
 
-    // Reset form
-    setFlowLevel(1);
-    setNausea(1);
-    setFatigue(1);
-    setPain(1);
-    setNotes('');
-    Alert.alert('Success', 'Period log added successfully!');
+      // Reset form
+      setFlowLevel(1);
+      setNausea(1);
+      setFatigue(1);
+      setPain(1);
+      setNotes('');
+      Alert.alert('Success', 'Period log added successfully!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to add period log. Please try again.');
+    }
   };
 
   const TypeButton = ({ type, label }: { type: 'start' | 'end'; label: string }) => (
@@ -408,7 +412,7 @@ const styles = StyleSheet.create({
     color: '#FF6B9D',
   },
   endType: {
-    color: '#4ECDC4',
+    color: '#E91E63',
   },
   logDetail: {
     fontSize: 14,

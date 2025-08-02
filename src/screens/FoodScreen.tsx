@@ -24,35 +24,51 @@ const FoodScreen = () => {
   const [timeAfterEating, setTimeAfterEating] = useState('');
   const [notes, setNotes] = useState('');
 
-  const handleLogFood = () => {
+  const handleLogFood = async () => {
+    console.log('[FoodScreen] handleLogFood called with:', {
+      selectedDate,
+      mealType,
+      foodItems: foodItems.trim(),
+      flareUpScore
+    });
+
     if (!selectedDate || !foodItems.trim()) {
+      console.log('[FoodScreen] Validation failed - missing date or food items');
       Alert.alert('Error', 'Please enter a date and food items');
       return;
     }
 
-    addFoodLog({
-      date: selectedDate,
-      mealType,
-      foodItems: foodItems.trim(),
-      flareUpScore,
-      symptomsAfter: {
-        nausea,
-        fatigue,
-        pain,
-      },
-      timeAfterEating: timeAfterEating.trim(),
-      notes: notes.trim(),
-    });
+    try {
+      console.log('[FoodScreen] About to call addFoodLog...');
+      await addFoodLog({
+        date: selectedDate,
+        mealType,
+        foodItems: foodItems.trim(),
+        flareUpScore,
+        symptomsAfter: {
+          nausea,
+          fatigue,
+          pain,
+        },
+        timeAfterEating: timeAfterEating.trim(),
+        notes: notes.trim(),
+      });
 
-    // Reset form
-    setFoodItems('');
-    setFlareUpScore(1);
-    setNausea(1);
-    setFatigue(1);
-    setPain(1);
-    setTimeAfterEating('');
-    setNotes('');
-    Alert.alert('Success', 'Food log added successfully!');
+      console.log('[FoodScreen] addFoodLog completed successfully');
+
+      // Reset form
+      setFoodItems('');
+      setFlareUpScore(1);
+      setNausea(1);
+      setFatigue(1);
+      setPain(1);
+      setTimeAfterEating('');
+      setNotes('');
+      Alert.alert('Success', 'Food log added successfully!');
+    } catch (error) {
+      console.error('[FoodScreen] Error in handleLogFood:', error);
+      Alert.alert('Error', 'Failed to add food log. Please try again.');
+    }
   };
 
   const MealTypeButton = ({ 
@@ -301,15 +317,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mealTypeButtonSelected: {
-    backgroundColor: '#E8F4FD',
-    borderColor: '#4ECDC4',
+    backgroundColor: '#FFE5F1',
+    borderColor: '#FF6B9D',
   },
   mealTypeButtonText: {
     fontSize: 14,
     color: '#2C3E50',
   },
   mealTypeButtonTextSelected: {
-    color: '#4ECDC4',
+    color: '#FF6B9D',
     fontWeight: '600',
   },
   foodInput: {
@@ -341,7 +357,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   logButton: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF6B9D',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -353,12 +369,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   insightCard: {
-    backgroundColor: '#E8F4FD',
+    backgroundColor: '#FFE5F1',
     padding: 20,
     borderRadius: 15,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4',
+    borderLeftColor: '#FF6B9D',
   },
   insightTitle: {
     fontSize: 16,
@@ -389,7 +405,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4',
+    borderLeftColor: '#FF6B9D',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -416,7 +432,7 @@ const styles = StyleSheet.create({
   mealTypeBadgeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF6B9D',
   },
   logFood: {
     fontSize: 14,
