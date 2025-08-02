@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import Slider from '@react-native-community/slider';
 
 interface SymptomSliderProps {
   label: string;
@@ -34,27 +35,26 @@ const SymptomSlider: React.FC<SymptomSliderProps> = ({
         </View>
       </View>
       
-      {/* Custom slider using touchable buttons */}
-      <View style={styles.buttonContainer}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-          <TouchableOpacity
-            key={num}
-            style={[
-              styles.scaleButton,
-              value === num && { backgroundColor: color },
-            ]}
-            onPress={() => onValueChange(num)}
-          >
-            <Text
-              style={[
-                styles.scaleButtonText,
-                value === num && { color: '#FFF' },
-              ]}
-            >
-              {num}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      {/* Slider component */}
+      <View style={styles.sliderContainer}>
+        <Slider
+          style={styles.slider}
+          minimumValue={1}
+          maximumValue={10}
+          step={1}
+          value={value}
+          onValueChange={onValueChange}
+          minimumTrackTintColor={color}
+          maximumTrackTintColor="#E0E0E0"
+          thumbStyle={{ backgroundColor: color, width: 20, height: 20 }}
+        />
+      </View>
+      
+      {/* Scale numbers */}
+      <View style={styles.scaleNumbers}>
+        <Text style={styles.scaleNumberText}>1</Text>
+        <Text style={styles.scaleNumberText}>5</Text>
+        <Text style={styles.scaleNumberText}>10</Text>
       </View>
       
       <View style={styles.scaleLabels}>
@@ -102,26 +102,25 @@ const styles = StyleSheet.create({
     color: '#7F8C8D',
     marginTop: 2,
   },
-  buttonContainer: {
+  sliderContainer: {
+    marginVertical: 15,
+    paddingHorizontal: 10,
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  scaleNumbers: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 15,
-    flexWrap: 'wrap',
+    paddingHorizontal: 10,
+    marginTop: -5,
+    marginBottom: 5,
   },
-  scaleButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#FFE5F1',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  scaleButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#2C3E50',
+  scaleNumberText: {
+    fontSize: 12,
+    color: '#7F8C8D',
+    fontWeight: '500',
   },
   scaleLabels: {
     flexDirection: 'row',

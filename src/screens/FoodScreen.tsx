@@ -6,11 +6,12 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert 
+  Alert,
+  StatusBar 
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEndoCare } from '../context/EndoCareContext';
 import SymptomSlider from '../components/SymptomSlider';
+import DatePickerInput from '../components/DatePickerInput';
 
 const FoodScreen = () => {
   const { state, addFoodLog } = useEndoCare();
@@ -71,6 +72,16 @@ const FoodScreen = () => {
     }
   };
 
+  const getMealColor = (mealType: string) => {
+    switch (mealType) {
+      case 'breakfast': return '#FFD93D';
+      case 'lunch': return '#4ECDC4';
+      case 'dinner': return '#9B59B6';
+      case 'snack': return '#FF8C42';
+      default: return '#FF6B9D';
+    }
+  };
+
   const MealTypeButton = ({ 
     type, 
     label 
@@ -81,7 +92,7 @@ const FoodScreen = () => {
     <TouchableOpacity
       style={[
         styles.mealTypeButton,
-        mealType === type && styles.mealTypeButtonSelected
+        mealType === type && { ...styles.mealTypeButtonSelected, backgroundColor: '#FFB3CE' }
       ]}
       onPress={() => setMealType(type)}
     >
@@ -105,11 +116,11 @@ const FoodScreen = () => {
     let insight = '';
     if (triggerFoods.length > 0) {
       const commonTriggers = triggerFoods.map(log => log.foodItems).slice(0, 3);
-      insight += `⚠️ Potential triggers: ${commonTriggers.join(', ')}. `;
+      insight += `Potential triggers: ${commonTriggers.join(', ')}. `;
     }
     
     if (safeFoods.length > 0) {
-      insight += `✅ Well-tolerated foods include items you've logged with low scores. `;
+      insight += `Well-tolerated foods include items you've logged with low scores. `;
     }
     
     // Check for common endometriosis trigger ingredients
@@ -125,19 +136,24 @@ const FoodScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Food & Trigger Tracker</Text>
-      <Text style={styles.subheader}>Identify foods that may trigger symptoms</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#FFB3CE" />
+      <View style={styles.headerContainer}>
+        <View style={styles.headerGradient}>
+          <Text style={styles.header}>Food Tracker</Text>
+          <Text style={styles.subheader}>Identify foods that may trigger symptoms</Text>
+        </View>
+      </View>
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Date Selection */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Date</Text>
-          <TextInput
-            style={styles.dateInput}
+          <DatePickerInput
             value={selectedDate}
-            onChangeText={setSelectedDate}
-            placeholder="YYYY-MM-DD"
+            onDateChange={setSelectedDate}
+            themeColor="#FFB3CE"
+            placeholder="Select meal date"
           />
         </View>
 
@@ -248,7 +264,7 @@ const FoodScreen = () => {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -262,31 +278,58 @@ const getScoreColor = (score: number): string => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FEFEFE',
+    backgroundColor: '#FDF4F8',
+  },
+  headerContainer: {
+    marginBottom: 0,
+  },
+  headerGradient: {
+    backgroundColor: '#FFB3CE',
+    paddingTop: 60,
+    paddingBottom: 25,
     paddingHorizontal: 20,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+    shadowColor: '#FFB3CE',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 5,
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subheader: {
     fontSize: 16,
-    color: '#7F8C8D',
-    marginBottom: 20,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    opacity: 0.9,
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   section: {
-    marginBottom: 25,
+    marginBottom: 30,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 10,
+    color: '#FF6B9D',
+    marginBottom: 15,
   },
   sectionSubtitle: {
     fontSize: 14,
@@ -294,12 +337,17 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   dateInput: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#E0E0E0',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 15,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F8F9FA',
     fontSize: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   mealTypeContainer: {
     flexDirection: 'row',
@@ -309,34 +357,47 @@ const styles = StyleSheet.create({
   mealTypeButton: {
     flex: 1,
     minWidth: '45%',
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: '#FFF',
-    borderWidth: 1,
+    padding: 15,
+    borderRadius: 15,
+    backgroundColor: '#F8F9FA',
+    borderWidth: 2,
     borderColor: '#E0E0E0',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   mealTypeButtonSelected: {
-    backgroundColor: '#FFE5F1',
-    borderColor: '#FF6B9D',
+    borderColor: 'transparent',
+    shadowColor: '#FFB3CE',
+    shadowOpacity: 0.3,
+    elevation: 4,
   },
   mealTypeButtonText: {
     fontSize: 14,
     color: '#2C3E50',
+    fontWeight: '500',
   },
   mealTypeButtonTextSelected: {
-    color: '#FF6B9D',
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
   foodInput: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#E0E0E0',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 15,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F8F9FA',
     fontSize: 16,
     minHeight: 80,
     textAlignVertical: 'top',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   timeInput: {
     borderWidth: 1,
@@ -347,50 +408,65 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   notesInput: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#E0E0E0',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 15,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F8F9FA',
     fontSize: 16,
     minHeight: 80,
     textAlignVertical: 'top',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   logButton: {
-    backgroundColor: '#FF6B9D',
-    padding: 18,
-    borderRadius: 12,
+    backgroundColor: '#FFB3CE',
+    padding: 20,
+    borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 25,
+    marginBottom: 30,
+    shadowColor: '#FFB3CE',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
   logButtonText: {
     color: '#FFF',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   insightCard: {
-    backgroundColor: '#FFE5F1',
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 25,
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF6B9D',
+    backgroundColor: '#FFB3CE',
+    padding: 25,
+    borderRadius: 20,
+    marginBottom: 30,
+    shadowColor: '#FFB3CE',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   insightTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 10,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 12,
   },
   insightText: {
-    fontSize: 14,
-    color: '#2C3E50',
-    marginBottom: 10,
+    fontSize: 15,
+    color: '#FFFFFF',
+    marginBottom: 12,
+    lineHeight: 22,
   },
   futureFeature: {
     fontSize: 12,
-    color: '#7F8C8D',
+    color: '#FFFFFF',
     fontStyle: 'italic',
+    opacity: 0.8,
   },
   emptyText: {
     fontSize: 16,
@@ -405,7 +481,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF6B9D',
+    borderLeftColor: '#FFB3CE',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,

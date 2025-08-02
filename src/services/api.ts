@@ -284,6 +284,36 @@ export async function getAllSymptoms(): Promise<SymptomList> {
 }
 
 // ============================================================================
+// TRIGGER SEVERITY API FUNCTIONS
+// ============================================================================
+
+// Import trigger types for response structure
+import type { FindTriggersResponse } from '../types/TriggerTypes';
+
+/**
+ * Fetch trigger severity data for heatmap visualization
+ * CUSTOMIZATION POINT: Adjust endpoint URL if backend changes
+ * 
+ * @returns Promise<FindTriggersResponse> - Trigger data with severity scores by date
+ * @throws ApiError if request fails or response is invalid
+ */
+export async function fetchTriggers(): Promise<FindTriggersResponse> {
+  console.log('[api] Fetching trigger severity data...');
+  
+  try {
+    const result = await apiCall<FindTriggersResponse>('/find_triggers', {
+      method: 'GET',
+    });
+    
+    console.log('[api] Trigger data fetched successfully');
+    return result;
+  } catch (error) {
+    console.error('[api] Failed to fetch trigger data:', error);
+    throw error;
+  }
+}
+
+// ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
 
