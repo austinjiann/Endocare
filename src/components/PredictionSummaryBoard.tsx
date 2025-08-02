@@ -22,7 +22,6 @@ const PredictionSummaryBoard: React.FC = () => {
       {/* Things to Avoid Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionIcon}>⚠️</Text>
           <Text style={styles.sectionTitle}>Things to Avoid</Text>
         </View>
         {avoidanceRecommendations.map((item, index) => (
@@ -36,13 +35,12 @@ const PredictionSummaryBoard: React.FC = () => {
       {/* Flare Prediction Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionIcon}>🔮</Text>
           <Text style={styles.sectionTitle}>Next Flare Prediction</Text>
         </View>
         <View style={styles.predictionContainer}>
           <View style={styles.predictionRow}>
             <Text style={styles.predictionLabel}>Severity:</Text>
-            <Text style={[styles.predictionValue, { color: '#FF6B9D' }]}>
+            <Text style={[styles.predictionValue, { color: '#C8A8D8' }]}>
               {flareprediction.severity}
             </Text>
           </View>
@@ -52,7 +50,7 @@ const PredictionSummaryBoard: React.FC = () => {
           </View>
           <View style={styles.predictionRow}>
             <Text style={styles.predictionLabel}>Confidence:</Text>
-            <Text style={[styles.predictionValue, { color: '#E91E63' }]}>
+            <Text style={[styles.predictionValue, { color: '#C8A8D8' }]}>
               {flareprediction.confidence}
             </Text>
           </View>
@@ -68,12 +66,12 @@ const PredictionSummaryBoard: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFE5F1',
+    backgroundColor: '#F4F1F7',
     padding: 20,
     borderRadius: 15,
     marginBottom: 20,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF6B9D',
+    borderLeftColor: '#C8A8D8',
   },
   title: {
     fontSize: 18,
@@ -141,7 +139,7 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     fontSize: 11,
-    color: '#FF6B9D',
+    color: '#C8A8D8',
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: 10,

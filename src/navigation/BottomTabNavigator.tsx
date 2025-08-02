@@ -1,5 +1,5 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
 
@@ -9,26 +9,41 @@ import FoodScreen from '../screens/FoodScreen';
 import SleepScreen from '../screens/SleepScreen';
 import SymptomScreen from '../screens/SymptomScreen';
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 
 export default function BottomTabNavigator() {
   return (
     <Tab.Navigator
+      tabBarPosition="bottom"
+      swipeEnabled={true}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
           backgroundColor: '#FEFEFE',
           borderTopWidth: 1,
           borderTopColor: '#F0F0F0',
-          height: Platform.OS === 'ios' ? 88 : 65,
-          paddingBottom: Platform.OS === 'ios' ? 20 : 10,
-          paddingTop: 10,
+          height: Platform.OS === 'ios' ? 110 : 90,
+          paddingBottom: Platform.OS === 'ios' ? 35 : 20,
+          paddingTop: 12,
         },
-        tabBarActiveTintColor: '#FF6B9D',
+        tabBarActiveTintColor: '#C8A8D8',
         tabBarInactiveTintColor: '#7F8C8D',
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: '600',
+          marginTop: 2,
+          marginBottom: 4,
+          textAlign: 'center',
+        },
+        tabBarItemStyle: {
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 60,
+        },
+        tabBarShowIcon: true,
+        tabBarIndicatorStyle: {
+          backgroundColor: '#C8A8D8',
+          height: 3,
         },
       }}
     >
