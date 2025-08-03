@@ -101,7 +101,7 @@ const MenstrualChart: React.FC<MenstrualChartProps> = ({
             if (periodEntry) {
                 // Use real data if available
                 flowLevel = periodEntry.flowLevel || 0;
-                periodType = periodEntry.type === "start" ? "start" as const :
+                periodType = periodEntry.type !== "luteal" ? "start" as const :
                     periodEntry.type === "end" ? "end" as const : "ongoing" as const;
                 hasData = true;
             } else if (periodLogs.length === 0) {

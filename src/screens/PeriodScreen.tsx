@@ -183,7 +183,7 @@ const PeriodScreen = () => {
                 </View>
 
                 {/* Flow Level (only for start events) */}
-                {periodType === "start" && (
+                {periodType !== "luteal" && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Flow Level</Text>
                         <Text style={styles.sectionSubtitle}>How heavy is your flow today?</Text>

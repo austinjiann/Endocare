@@ -368,7 +368,7 @@ interface LowSleepHours {
     details: TriggerDetail[];
 }
 
-interface TriggerSummary {
+export interface TriggerSummary {
     common_food_items: CategoryWithCountsAndDetails;
     flow_levels: CategoryWithCountsAndDetails;
     low_sleep_hours: LowSleepHours;
