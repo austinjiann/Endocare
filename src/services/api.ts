@@ -353,6 +353,46 @@ export async function fetchSevenDayAverage(): Promise<sevenDayAverage> {
     }
 }
 
+interface TriggerDetail {
+    date: string; // ISO date string, e.g., "2025-08-11"
+    trigger_severity: number;
+}
+
+interface CategoryWithCountsAndDetails {
+    counts: Record<string, number>;
+    details: Record<string, TriggerDetail[]>;
+}
+
+interface LowSleepHours {
+    count: number;
+    details: TriggerDetail[];
+}
+
+interface TriggerSummary {
+    common_food_items: CategoryWithCountsAndDetails;
+    flow_levels: CategoryWithCountsAndDetails;
+    low_sleep_hours: LowSleepHours;
+    menstrual_events: CategoryWithCountsAndDetails;
+    standard_deviation: number;
+    symptom_average: number;
+    symptom_spike_threshold: number;
+}
+export async function fetchTriggerSummary(): Promise<TriggerSummary> {
+    console.log("[api] Fetching trigger summary...");
+
+    try {
+        const result = await apiCall<TriggerSummary>("/find_triggers", {
+            method: "GET",
+        });
+
+        console.log("[api] Trigger summary fetched successfully:", result);
+        return result;
+    } catch (error) {
+        console.error("[api] Failed to fetch trigger summary:", error);
+        throw error;
+    }
+}
+
 interface flareupPrediction {
     flareup_predictions: string[];
     flareup_probability: number; // 1-100

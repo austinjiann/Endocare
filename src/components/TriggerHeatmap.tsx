@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchTriggers } from "../services/api";
+import { fetchTriggers, fetchTriggerSummary } from "../services/api";
 import type { DailySeverity, FindTriggersResponse, HeatmapCell, TriggerEntry } from "../types/TriggerTypes";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -43,6 +43,51 @@ const TriggerHeatmap: React.FC = () => {
         const gaps = 6 * 4; // Gaps between 7 columns
         const availableWidth = screenWidth - padding - dayLabelWidth - gaps;
         return Math.max(Math.floor(availableWidth / 7), 25); // Minimum 25px cells for monthly view
+    }, []);
+
+    // Correctly type the heatmap data state
+    const [heatmapData, setHeatmapData] = useState<DailySeverity[]>([]);
+
+    function aggregateSeverityByDate(data: any): DailySeverity[] {
+        const dateMap: Record<string, number> = {};
+
+        const extractSeverities = (obj: any) => {
+            if (Array.isArray(obj)) {
+                for (const item of obj) {
+                    if (item && typeof item === 'object' && 'trigger_severity' in item && 'date' in item) {
+                        const date = item.date;
+                        const severity = item.trigger_severity;
+                        if (!dateMap[date]) {
+                            dateMap[date] = 0;
+                        }
+                        dateMap[date] += severity;
+                    }
+                }
+            } else if (obj && typeof obj === 'object') {
+                for (const value of Object.values(obj)) {
+                    extractSeverities(value);
+                }
+            }
+        };
+
+        for (const [key, value] of Object.entries(data)) {
+            if (['standard_deviation', 'symptom_average', 'symptom_spike_threshold'].includes(key)) continue;
+            extractSeverities(value);
+        }
+
+        const allDates = Object.keys(dateMap).sort();
+        return allDates.map(date => ({
+            date,
+            severity: dateMap[date] || 0
+        }));
+    }
+
+    useEffect(() => {
+        fetchTriggerSummary().then((data) => {
+            const aggregatedData = aggregateSeverityByDate(data);
+            setHeatmapData(aggregatedData);
+            console.log("Aggregated Heatmap Data:", aggregatedData);
+        });
     }, []);
 
     useEffect(() => {
@@ -94,24 +139,6 @@ const TriggerHeatmap: React.FC = () => {
     };
 
     /**
-     * Aggregate trigger severities by date (average multiple entries per day)
-     */
-    const aggregateByDate = (entries: TriggerEntry[]): DailySeverity[] => {
-        const dateMap = new Map<string, number[]>();
-
-        entries.forEach(entry => {
-            const existing = dateMap.get(entry.date) || [];
-            existing.push(entry.trigger_severity);
-            dateMap.set(entry.date, existing);
-        });
-
-        return Array.from(dateMap.entries()).map(([date, severities]) => ({
-            date,
-            severity: severities.reduce((sum, val) => sum + val, 0) / severities.length
-        }));
-    };
-
-    /**
      * Generate color based on severity value
      * CUSTOMIZATION POINT: Adjust color mapping logic
      */
@@ -144,13 +171,18 @@ const TriggerHeatmap: React.FC = () => {
     }, [triggerData]);
 
     /**
-     * Generate calendar grid for current month
+     * Generate calendar grid for current month using heatmapData
      */
     const monthCalendarData = useMemo(() => {
-        if (!triggerData) return [];
+        if (!heatmapData.length) return [];
 
-        const entries = extractTriggerEntries(triggerData);
-        const dailySeverities = aggregateByDate(entries);
+        // Filter heatmapData for current month
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+        const dailySeverities = heatmapData.filter(({ date }) => {
+            const d = new Date(date);
+            return d.getFullYear() === year && d.getMonth() === month;
+        });
 
         // Create severity map for quick lookup
         const severityMap = new Map<string, number>();
@@ -159,8 +191,6 @@ const TriggerHeatmap: React.FC = () => {
         });
 
         // Get current month details
-        const year = currentMonth.getFullYear();
-        const month = currentMonth.getMonth();
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const daysInMonth = lastDay.getDate();
@@ -173,7 +203,6 @@ const TriggerHeatmap: React.FC = () => {
         for (let week = 0; week < 6; week++) {
             for (let day = 0; day < 7; day++) {
                 if (week === 0 && day < startDayOfWeek) {
-                    // Empty cell before month starts
                     grid[week].push({
                         date: "",
                         severity: null,
@@ -182,9 +211,8 @@ const TriggerHeatmap: React.FC = () => {
                         isEmpty: true
                     });
                 } else if (currentDay <= daysInMonth) {
-                    // Actual day in month
                     const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(currentDay).padStart(2, "0")}`;
-                    const severity = severityMap.get(dateString) || null;
+                    const severity = severityMap.get(dateString) ?? null;
 
                     grid[week].push({
                         date: dateString,
@@ -195,7 +223,6 @@ const TriggerHeatmap: React.FC = () => {
                     });
                     currentDay++;
                 } else {
-                    // Empty cell after month ends
                     grid[week].push({
                         date: "",
                         severity: null,
@@ -207,9 +234,8 @@ const TriggerHeatmap: React.FC = () => {
             }
         }
 
-        // Remove empty weeks at the end
         return grid.filter(week => week.some(cell => !cell.isEmpty));
-    }, [triggerData, currentMonth]);
+    }, [heatmapData, currentMonth]);
 
     /**
      * Navigation functions

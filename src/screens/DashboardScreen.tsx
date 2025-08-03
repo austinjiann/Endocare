@@ -165,27 +165,6 @@ const DashboardScreen = ({ navigation }: any) => {
                         Log comprehensive symptom data
                     </Text>
                 </TouchableOpacity>
-
-                {/* Stats summary */}
-                <View style={styles.statsContainer}>
-                    <Text style={styles.statsTitle}>Tracking Progress</Text>
-                    <Text style={styles.statsText}>
-                        Total
-                        Entries: {state.symptomLogs.length + state.periodLogs.length + state.foodLogs.length + state.sleepLogs.length}
-                    </Text>
-                    <Text style={styles.statsText}>
-                        Period Logs: {state.periodLogs.length}
-                    </Text>
-                    <Text style={styles.statsText}>
-                        Food Logs: {state.foodLogs.length}
-                    </Text>
-                    <Text style={styles.statsText}>
-                        Sleep Logs: {state.sleepLogs.length}
-                    </Text>
-                    <Text style={styles.statsText}>
-                        Symptom Logs: {state.symptomLogs.length}
-                    </Text>
-                </View>
             </ScrollView>
         </View>
     );
