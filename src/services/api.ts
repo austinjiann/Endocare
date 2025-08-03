@@ -1,6 +1,6 @@
 // API service layer for EndoCare backend integration
 // Base URL for the ngrok tunnel
-const API_BASE_URL = "https://c6c2ee9dcf66.ngrok-free.app"; // ngrok tunnel to backend server
+const API_BASE_URL = "https://e40dbaa9a15f.ngrok-free.app"; // ngrok tunnel to backend server
 
 // Type definitions for API requests (from backend engineer)
 export type InsertSleepRequest = {

@@ -16,13 +16,8 @@ export interface SymptomEntry {
 export interface PeriodLog {
     id: string;
     date: string;
-    type: "start" | "end";
-    flowLevel?: number;     // 1-5 scale (light to heavy)
-    associatedSymptoms?: {
-        nausea: number;
-        fatigue: number;
-        pain: number;
-    };
+    type: string;
+    flowLevel?: string;
     notes?: string;
     // TODO: Add cycle length tracking, ovulation indicators
 }
@@ -439,7 +434,7 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
         try {
             // First, check if backend is healthy using direct fetch
             console.log("[context] Checking backend health with direct fetch...");
-            const healthResponse = await fetch("https://c6c2ee9dcf66.ngrok-free.app/get_all_sleep", {
+            const healthResponse = await fetch("https://e40dbaa9a15f.ngrok-free.app/get_all_sleep", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -469,16 +464,16 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
 
             // Load all data using direct fetch calls
             const [sleepResponse, dietResponse, menstrualResponse, symptomsResponse] = await Promise.all([
-                fetch("https://c6c2ee9dcf66.ngrok-free.app/get_all_sleep", {
+                fetch("https://e40dbaa9a15f.ngrok-free.app/get_all_sleep", {
                     headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }
                 }),
-                fetch("https://c6c2ee9dcf66.ngrok-free.app/get_all_diet", {
+                fetch("https://e40dbaa9a15f.ngrok-free.app/get_all_diet", {
                     headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }
                 }),
-                fetch("https://c6c2ee9dcf66.ngrok-free.app/get_all_menstrual", {
+                fetch("https://e40dbaa9a15f.ngrok-free.app/get_all_menstrual", {
                     headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }
                 }),
-                fetch("https://c6c2ee9dcf66.ngrok-free.app/get_all_symptoms", {
+                fetch("https://e40dbaa9a15f.ngrok-free.app/get_all_symptoms", {
                     headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }
                 })
             ]);
@@ -551,7 +546,7 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
         // Always attempt to sync with API using direct fetch
         try {
             console.log("[context] Making direct fetch call to insert_symptoms...");
-            const response = await fetch("https://c6c2ee9dcf66.ngrok-free.app/insert_symptoms", {
+            const response = await fetch("https://e40dbaa9a15f.ngrok-free.app/insert_symptoms", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -596,7 +591,7 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
         try {
             console.log("[context] Making direct fetch call to insert_menstrual...");
             const flowLevel = log.flowLevel === 1 ? "light" : log.flowLevel === 3 ? "moderate" : "heavy";
-            const response = await fetch("https://c6c2ee9dcf66.ngrok-free.app/insert_menstrual", {
+            const response = await fetch("https://e40dbaa9a15f.ngrok-free.app/insert_menstrual", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -639,7 +634,7 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
         // Always attempt to sync with API using direct fetch
         try {
             console.log("[context] Making direct fetch call to insert_diet...");
-            const response = await fetch("https://c6c2ee9dcf66.ngrok-free.app/insert_diet", {
+            const response = await fetch("https://e40dbaa9a15f.ngrok-free.app/insert_diet", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -682,7 +677,7 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
         // Always attempt to sync with API using direct fetch
         try {
             console.log("[context] Making direct fetch call to insert_sleep...");
-            const response = await fetch("https://c6c2ee9dcf66.ngrok-free.app/insert_sleep", {
+            const response = await fetch("https://e40dbaa9a15f.ngrok-free.app/insert_sleep", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
