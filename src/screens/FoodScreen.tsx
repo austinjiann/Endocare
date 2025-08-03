@@ -6,15 +6,16 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert,
   StatusBar 
 } from 'react-native';
 import { useEndoCare } from '../context/EndoCareContext';
+import { useAlert } from '../context/AlertContext';
 import SymptomSlider from '../components/SymptomSlider';
 import DatePickerInput from '../components/DatePickerInput';
 
 const FoodScreen = () => {
   const { state, addFoodLog } = useEndoCare();
+  const { showAlert } = useAlert();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast');
   const [foodItems, setFoodItems] = useState('');
@@ -35,7 +36,12 @@ const FoodScreen = () => {
 
     if (!selectedDate || !foodItems.trim()) {
       console.log('[FoodScreen] Validation failed - missing date or food items');
-      Alert.alert('Error', 'Please enter a date and food items');
+      showAlert({
+        title: 'Error',
+        message: 'Please enter a date and food items',
+        type: 'error',
+        themeColor: '#A8D5BA'
+      });
       return;
     }
 
@@ -65,10 +71,20 @@ const FoodScreen = () => {
       setPain(1);
       setTimeAfterEating('');
       setNotes('');
-      Alert.alert('Success', 'Food log added successfully!');
+      showAlert({
+        title: 'Success',
+        message: 'Food log added successfully!',
+        type: 'success',
+        themeColor: '#A8D5BA'
+      });
     } catch (error) {
       console.error('[FoodScreen] Error in handleLogFood:', error);
-      Alert.alert('Error', 'Failed to add food log. Please try again.');
+      showAlert({
+        title: 'Error',
+        message: 'Failed to add food log. Please try again.',
+        type: 'error',
+        themeColor: '#A8D5BA'
+      });
     }
   };
 

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useEndoCare } from '../context/EndoCareContext';
+import { useAlert } from '../context/AlertContext';
 
 const QuickSymptomLogger: React.FC = () => {
   const { addSymptomLog } = useEndoCare();
+  const { showAlert } = useAlert();
   const [nausea, setNausea] = useState(1);
   const [fatigue, setFatigue] = useState(1);
   const [pain, setPain] = useState(1);
@@ -19,7 +21,12 @@ const QuickSymptomLogger: React.FC = () => {
       notes: 'Quick log from dashboard'
     });
 
-    Alert.alert('Success', 'Symptoms logged successfully!');
+    showAlert({
+      title: 'Success',
+      message: 'Symptoms logged successfully!',
+      type: 'success',
+      themeColor: '#C8A8D8'
+    });
     
     // Reset to minimal levels
     setNausea(1);

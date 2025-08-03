@@ -6,15 +6,16 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert,
   StatusBar 
 } from 'react-native';
 import { useEndoCare } from '../context/EndoCareContext';
+import { useAlert } from '../context/AlertContext';
 import SymptomSlider from '../components/SymptomSlider';
 import DatePickerInput from '../components/DatePickerInput';
 
 const PeriodScreen = () => {
   const { state, addPeriodLog } = useEndoCare();
+  const { showAlert } = useAlert();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [periodType, setPeriodType] = useState<'start' | 'end'>('start');
   const [flowLevel, setFlowLevel] = useState(1);
@@ -25,7 +26,12 @@ const PeriodScreen = () => {
 
   const handleLogPeriod = async () => {
     if (!selectedDate) {
-      Alert.alert('Error', 'Please select a date');
+      showAlert({
+        title: 'Error',
+        message: 'Please select a date',
+        type: 'error',
+        themeColor: '#F4A8C0'
+      });
       return;
     }
 
@@ -48,9 +54,19 @@ const PeriodScreen = () => {
       setFatigue(1);
       setPain(1);
       setNotes('');
-      Alert.alert('Success', 'Period log added successfully!');
+      showAlert({
+        title: 'Success',
+        message: 'Period log added successfully!',
+        type: 'success',
+        themeColor: '#F4A8C0'
+      });
     } catch (error) {
-      Alert.alert('Error', 'Failed to add period log. Please try again.');
+      showAlert({
+        title: 'Error',
+        message: 'Failed to add period log. Please try again.',
+        type: 'error',
+        themeColor: '#F4A8C0'
+      });
     }
   };
 

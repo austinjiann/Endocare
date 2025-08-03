@@ -1,6 +1,6 @@
 import React, { createContext, ReactNode, useContext, useEffect, useReducer } from "react";
-import { Alert } from "react-native";
 import * as API from "../services/api";
+import { useAlert } from "./AlertContext";
 
 // Core data types for endometriosis tracking
 export interface SymptomEntry {
@@ -429,6 +429,7 @@ function transformApiSymptomsToLocal(apiSymptoms: API.SymptomList): SymptomEntry
 // Context provider component
 export function EndoCareProvider({ children }: { children: ReactNode }) {
     const [state, dispatch] = useReducer(endoCareReducer, initialState);
+    const { showAlert } = useAlert();
 
     // Load initial data from API with health check and enhanced error handling
     const loadInitialData = async () => {
@@ -450,11 +451,13 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
                 console.log("[context] Health check failed - response not ok:", healthResponse.status);
                 dispatch({ type: "SET_CONNECTION_STATUS", payload: "offline" });
                 dispatch({ type: "SET_LAST_ERROR", payload: "Backend health check failed" });
-                Alert.alert(
-                    "Server Unavailable",
-                    "Cannot reach the server. Pull down to retry when connection is available.",
-                    [{ text: "OK" }]
-                );
+                showAlert({
+                    title: "Server Unavailable",
+                    message: "Cannot reach the server. Pull down to retry when connection is available.",
+                    type: "error",
+                    themeColor: "#C8A8D8",
+                    buttons: [{ text: "OK" }]
+                });
                 return;
             }
 
@@ -508,11 +511,13 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
             // Network or other error
             dispatch({ type: "SET_CONNECTION_STATUS", payload: "offline" });
             dispatch({ type: "SET_LAST_ERROR", payload: error instanceof Error ? error.message : "Unknown error" });
-            Alert.alert(
-                "Network Error",
-                "Check your internet connection and try again.",
-                [{ text: "OK" }]
-            );
+            showAlert({
+                title: "Network Error",
+                message: "Check your internet connection and try again.",
+                type: "error",
+                themeColor: "#C8A8D8",
+                buttons: [{ text: "OK" }]
+            });
         } finally {
             dispatch({ type: "SET_LOADING", payload: false });
         }
@@ -563,7 +568,12 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
                 console.log("[context] insert_symptoms success:", result);
             } else {
                 console.error("[context] insert_symptoms failed:", response.status, response.statusText);
-                Alert.alert("Sync Warning", "Data saved locally but server sync failed.");
+                showAlert({
+                    title: "Sync Warning",
+                    message: "Data saved locally but server sync failed.",
+                    type: "warning",
+                    themeColor: "#FFB380"
+                });
             }
         } catch (error) {
             console.error("[context] Failed to sync symptom log:", error);
@@ -602,7 +612,12 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
                 console.log("[context] insert_menstrual success:", result);
             } else {
                 console.error("[context] insert_menstrual failed:", response.status, response.statusText);
-                Alert.alert("Sync Warning", "Data saved locally but server sync failed.");
+                showAlert({
+                    title: "Sync Warning",
+                    message: "Data saved locally but server sync failed.",
+                    type: "warning",
+                    themeColor: "#F4A8C0"
+                });
             }
         } catch (error) {
             console.error("[context] Failed to sync period log:", error);
@@ -640,7 +655,12 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
                 console.log("[context] insert_diet success:", result);
             } else {
                 console.error("[context] insert_diet failed:", response.status, response.statusText);
-                Alert.alert("Sync Warning", "Data saved locally but server sync failed.");
+                showAlert({
+                    title: "Sync Warning",
+                    message: "Data saved locally but server sync failed.",
+                    type: "warning",
+                    themeColor: "#A8D5BA"
+                });
             }
         } catch (error) {
             console.error("[context] Failed to sync food log:", error);
@@ -679,7 +699,12 @@ export function EndoCareProvider({ children }: { children: ReactNode }) {
                 console.log("[context] insert_sleep success:", result);
             } else {
                 console.error("[context] insert_sleep failed:", response.status, response.statusText);
-                Alert.alert("Sync Warning", "Data saved locally but server sync failed.");
+                showAlert({
+                    title: "Sync Warning",
+                    message: "Data saved locally but server sync failed.",
+                    type: "warning",
+                    themeColor: "#9AE6E0"
+                });
             }
         } catch (error) {
             console.error("[context] Failed to sync sleep log:", error);

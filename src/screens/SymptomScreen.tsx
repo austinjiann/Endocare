@@ -6,15 +6,16 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert,
   StatusBar 
 } from 'react-native';
 import { useEndoCare } from '../context/EndoCareContext';
+import { useAlert } from '../context/AlertContext';
 import SymptomSlider from '../components/SymptomSlider';
 import DatePickerInput from '../components/DatePickerInput';
 
 const SymptomScreen = () => {
   const { state, addSymptomLog } = useEndoCare();
+  const { showAlert } = useAlert();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [nausea, setNausea] = useState(1);
   const [fatigue, setFatigue] = useState(1);
@@ -23,7 +24,12 @@ const SymptomScreen = () => {
 
   const handleLogSymptoms = async () => {
     if (!selectedDate) {
-      Alert.alert('Error', 'Please select a date');
+      showAlert({
+        title: 'Error',
+        message: 'Please select a date',
+        type: 'error',
+        themeColor: '#FFB380'
+      });
       return;
     }
 
@@ -41,9 +47,19 @@ const SymptomScreen = () => {
       setFatigue(1);
       setPain(1);
       setNotes('');
-      Alert.alert('Success', 'Symptoms logged successfully!');
+      showAlert({
+        title: 'Success',
+        message: 'Symptoms logged successfully!',
+        type: 'success',
+        themeColor: '#FFB380'
+      });
     } catch (error) {
-      Alert.alert('Error', 'Failed to log symptoms. Please try again.');
+      showAlert({
+        title: 'Error',
+        message: 'Failed to log symptoms. Please try again.',
+        type: 'error',
+        themeColor: '#FFB380'
+      });
     }
   };
 

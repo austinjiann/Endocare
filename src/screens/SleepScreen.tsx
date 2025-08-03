@@ -6,15 +6,16 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert,
   StatusBar 
 } from 'react-native';
 import { useEndoCare } from '../context/EndoCareContext';
+import { useAlert } from '../context/AlertContext';
 import SymptomSlider from '../components/SymptomSlider';
 import DatePickerInput from '../components/DatePickerInput';
 
 const SleepScreen = () => {
   const { state, addSleepLog } = useEndoCare();
+  const { showAlert } = useAlert();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [hoursSlept, setHoursSlept] = useState('');
   const [sleepQuality, setSleepQuality] = useState(1);
@@ -28,12 +29,22 @@ const SleepScreen = () => {
     const hours = parseFloat(hoursSlept);
     
     if (!selectedDate || !hoursSlept || isNaN(hours)) {
-      Alert.alert('Error', 'Please enter a date and hours slept');
+      showAlert({
+        title: 'Error',
+        message: 'Please enter a date and hours slept',
+        type: 'error',
+        themeColor: '#9AE6E0'
+      });
       return;
     }
 
     if (hours < 0 || hours > 24) {
-      Alert.alert('Error', 'Hours slept must be between 0 and 24');
+      showAlert({
+        title: 'Error',
+        message: 'Hours slept must be between 0 and 24',
+        type: 'error',
+        themeColor: '#9AE6E0'
+      });
       return;
     }
 
@@ -59,9 +70,19 @@ const SleepScreen = () => {
       setPain(1);
       setSleepDisruptions('');
       setNotes('');
-      Alert.alert('Success', 'Sleep log added successfully!');
+      showAlert({
+        title: 'Success',
+        message: 'Sleep log added successfully!',
+        type: 'success',
+        themeColor: '#9AE6E0'
+      });
     } catch (error) {
-      Alert.alert('Error', 'Failed to add sleep log. Please try again.');
+      showAlert({
+        title: 'Error',
+        message: 'Failed to add sleep log. Please try again.',
+        type: 'error',
+        themeColor: '#9AE6E0'
+      });
     }
   };
 
