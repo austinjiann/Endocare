@@ -16,15 +16,9 @@ export interface SymptomEntry {
 export interface PeriodLog {
     id: string;
     date: string;
-    type: "start" | "end";
-    flowLevel?: number;     // 1-5 scale (light to heavy)
-    associatedSymptoms?: {
-        nausea: number;
-        fatigue: number;
-        pain: number;
-    };
+    type: string;
+    flowLevel?: string;
     notes?: string;
-    // TODO: Add cycle length tracking, ovulation indicators
 }
 
 export interface FoodLog {
