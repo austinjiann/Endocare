@@ -331,6 +331,27 @@ export async function fetchRecommendations(): Promise<string[]> {
     }
 }
 
+interface sevenDayAverage {
+    average_fatigue: number; // 0-10 scale
+    average_nausea: number; // 0-10 scale
+    average_pain: number; // 0-10 scale
+}
+
+export async function fetchSevenDayAverage(): Promise<sevenDayAverage> {
+    console.log("[api] Fetching 7-day symptom averages...");
+
+    try {
+        const result = await apiCall<sevenDayAverage>("/seven_day_average", {
+            method: "GET",
+        });
+
+        console.log("[api] 7-day averages fetched successfully:", result);
+        return result;
+    } catch (error) {
+        console.error("[api] Failed to fetch 7-day averages:", error);
+        throw error;
+    }
+}
 
 interface flareupPrediction {
     flareup_predictions: string[];
@@ -351,7 +372,7 @@ export const fetchFlareupPrediction = async (): Promise<flareupPrediction> => {
         console.error("[api] Failed to fetch flareup prediction:", error);
         throw error;
     }
-}
+};
 
 // ============================================================================
 // UTILITY FUNCTIONS
