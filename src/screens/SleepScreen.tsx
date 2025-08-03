@@ -1,418 +1,435 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  TextInput,
-  StatusBar 
-} from 'react-native';
-import { useEndoCare } from '../context/EndoCareContext';
-import { useAlert } from '../context/AlertContext';
-import SymptomSlider from '../components/SymptomSlider';
-import DatePickerInput from '../components/DatePickerInput';
-import SleepChart from '../components/SleepChart';
+import React, { useEffect, useState } from "react";
+import { ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useEndoCare } from "../context/EndoCareContext";
+import { useAlert } from "../context/AlertContext";
+import SymptomSlider from "../components/SymptomSlider";
+import DatePickerInput from "../components/DatePickerInput";
+import SleepChart from "../components/SleepChart";
+import { SleepEntry } from "../context/AppContext";
+import { getAllSleep, SleepList } from "../services/api";
 
 const SleepScreen = () => {
-  const { state, addSleepLog } = useEndoCare();
-  const { showAlert } = useAlert();
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [hoursSlept, setHoursSlept] = useState('');
-  const [sleepQuality, setSleepQuality] = useState(1);
-  const [nausea, setNausea] = useState(1);
-  const [fatigue, setFatigue] = useState(1);
-  const [pain, setPain] = useState(1);
-  const [sleepDisruptions, setSleepDisruptions] = useState('');
-  const [notes, setNotes] = useState('');
+    const { state, addSleepLog } = useEndoCare();
+    const { showAlert } = useAlert();
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+    const [hoursSlept, setHoursSlept] = useState("");
+    const [sleepQuality, setSleepQuality] = useState(1);
+    const [nausea, setNausea] = useState(1);
+    const [fatigue, setFatigue] = useState(1);
+    const [pain, setPain] = useState(1);
+    const [sleepDisruptions, setSleepDisruptions] = useState("");
+    const [notes, setNotes] = useState("");
 
-  const handleLogSleep = async () => {
-    const hours = parseFloat(hoursSlept);
-    
-    if (!selectedDate || !hoursSlept || isNaN(hours)) {
-      showAlert({
-        title: 'Error',
-        message: 'Please enter a date and hours slept',
-        type: 'error',
-        themeColor: '#9AE6E0'
-      });
-      return;
-    }
+    const handleLogSleep = async () => {
+        const hours = parseFloat(hoursSlept);
 
-    if (hours < 0 || hours > 24) {
-      showAlert({
-        title: 'Error',
-        message: 'Hours slept must be between 0 and 24',
-        type: 'error',
-        themeColor: '#9AE6E0'
-      });
-      return;
-    }
+        if (!selectedDate || !hoursSlept || isNaN(hours)) {
+            showAlert({
+                title: "Error",
+                message: "Please enter a date and hours slept",
+                type: "error",
+                themeColor: "#9AE6E0"
+            });
+            return;
+        }
 
-    try {
-      await addSleepLog({
-        date: selectedDate,
-        hoursSlept: hours,
-        sleepQuality,
-        morningSymptoms: {
-          nausea,
-          fatigue,
-          pain,
-        },
-        sleepDisruptions: sleepDisruptions.trim(),
-        notes: notes.trim(),
-      });
+        if (hours < 0 || hours > 24) {
+            showAlert({
+                title: "Error",
+                message: "Hours slept must be between 0 and 24",
+                type: "error",
+                themeColor: "#9AE6E0"
+            });
+            return;
+        }
 
-      // Reset form
-      setHoursSlept('');
-      setSleepQuality(1);
-      setNausea(1);
-      setFatigue(1);
-      setPain(1);
-      setSleepDisruptions('');
-      setNotes('');
-      showAlert({
-        title: 'Success',
-        message: 'Sleep log added successfully!',
-        type: 'success',
-        themeColor: '#9AE6E0'
-      });
-    } catch (error) {
-      showAlert({
-        title: 'Error',
-        message: 'Failed to add sleep log. Please try again.',
-        type: 'error',
-        themeColor: '#9AE6E0'
-      });
-    }
-  };
+        try {
+            await addSleepLog({
+                date: selectedDate,
+                hoursSlept: hours,
+                sleepQuality,
+                morningSymptoms: {
+                    nausea,
+                    fatigue,
+                    pain,
+                },
+                sleepDisruptions: sleepDisruptions.trim(),
+                notes: notes.trim(),
+            });
 
-  const getSleepInsights = () => {
-    const recentLogs = state.sleepLogs.slice(-7);
-    if (recentLogs.length < 3) return 'Track more nights to see sleep patterns';
-    
-    const avgHours = recentLogs.reduce((sum, log) => sum + log.hoursSlept, 0) / recentLogs.length;
-    const avgQuality = recentLogs.reduce((sum, log) => sum + log.sleepQuality, 0) / recentLogs.length;
-    const avgMorningPain = recentLogs.reduce((sum, log) => 
-      sum + (log.morningSymptoms?.pain || 0), 0) / recentLogs.length;
-    
-    let insight = '';
-    
-    if (avgHours < 6) {
-      insight += 'Getting less than 6 hours of sleep regularly. Poor sleep can worsen endometriosis symptoms. ';
-    } else if (avgHours > 9) {
-      insight += 'Sleeping more than 9 hours regularly may indicate fatigue from symptoms. ';
-    } else {
-      insight += 'Sleep duration appears healthy (6-9 hours). ';
-    }
-    
-    if (avgQuality < 4) {
-      insight += 'Low sleep quality detected. Consider sleep hygiene improvements. ';
-    }
-    
-    if (avgMorningPain > 5) {
-      insight += 'High morning pain levels may be disrupting sleep recovery. ';
-    }
-    
-    // Check for disruption patterns
-    const disruptedNights = recentLogs.filter(log => 
-      log.sleepDisruptions && log.sleepDisruptions.toLowerCase().includes('pain')
-    ).length;
-    
-    if (disruptedNights > recentLogs.length / 2) {
-      insight += 'Pain is frequently disrupting your sleep. Consider discussing pain management with your healthcare provider.';
-    }
-    
-    return insight || 'Sleep patterns appear stable. Keep tracking for better insights.';
-  };
-
-  const getAverageStats = () => {
-    const recent = state.sleepLogs.slice(-7);
-    if (recent.length === 0) return { hours: 0, quality: 0 };
-    
-    return {
-      hours: (recent.reduce((sum, log) => sum + log.hoursSlept, 0) / recent.length).toFixed(1),
-      quality: (recent.reduce((sum, log) => sum + log.sleepQuality, 0) / recent.length).toFixed(1),
+            // Reset form
+            setHoursSlept("");
+            setSleepQuality(1);
+            setNausea(1);
+            setFatigue(1);
+            setPain(1);
+            setSleepDisruptions("");
+            setNotes("");
+            showAlert({
+                title: "Success",
+                message: "Sleep log added successfully!",
+                type: "success",
+                themeColor: "#9AE6E0"
+            });
+        } catch (error) {
+            showAlert({
+                title: "Error",
+                message: "Failed to add sleep log. Please try again.",
+                type: "error",
+                themeColor: "#9AE6E0"
+            });
+        }
     };
-  };
 
-  const avgStats = getAverageStats();
+    const getSleepInsights = () => {
+        const recentLogs = state.sleepLogs.slice(-7);
+        if (recentLogs.length < 3) return "Track more nights to see sleep patterns";
 
-  return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#9AE6E0" />
-      <View style={styles.headerContainer}>
-        <View style={styles.headerGradient}>
-          <Text style={styles.header}>Sleep Tracker</Text>
-          <Text style={styles.subheader}>Monitor sleep quality and morning symptoms</Text>
-        </View>
-      </View>
-      
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Sleep Stats */}
-        {state.sleepLogs.length > 0 && (
-          <View style={styles.statsContainer}>
-            <Text style={styles.statsTitle}>7-Day Sleep Averages</Text>
-            <View style={styles.statsRow}>
-              <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{avgStats.hours}h</Text>
-                <Text style={styles.statLabel}>Avg Hours</Text>
-              </View>
-              <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{avgStats.quality}/10</Text>
-                <Text style={styles.statLabel}>Avg Quality</Text>
-              </View>
+        const avgHours = recentLogs.reduce((sum, log) => sum + log.hoursSlept, 0) / recentLogs.length;
+        const avgQuality = recentLogs.reduce((sum, log) => sum + log.sleepQuality, 0) / recentLogs.length;
+        const avgMorningPain = recentLogs.reduce((sum, log) =>
+            sum + (log.morningSymptoms?.pain || 0), 0) / recentLogs.length;
+
+        let insight = "";
+
+        if (avgHours < 6) {
+            insight += "Getting less than 6 hours of sleep regularly. Poor sleep can worsen endometriosis symptoms. ";
+        } else if (avgHours > 9) {
+            insight += "Sleeping more than 9 hours regularly may indicate fatigue from symptoms. ";
+        } else {
+            insight += "Sleep duration appears healthy (6-9 hours). ";
+        }
+
+        if (avgQuality < 4) {
+            insight += "Low sleep quality detected. Consider sleep hygiene improvements. ";
+        }
+
+        if (avgMorningPain > 5) {
+            insight += "High morning pain levels may be disrupting sleep recovery. ";
+        }
+
+        // Check for disruption patterns
+        const disruptedNights = recentLogs.filter(log =>
+            log.sleepDisruptions && log.sleepDisruptions.toLowerCase().includes("pain")
+        ).length;
+
+        if (disruptedNights > recentLogs.length / 2) {
+            insight += "Pain is frequently disrupting your sleep. Consider discussing pain management with your healthcare provider.";
+        }
+
+        return insight || "Sleep patterns appear stable. Keep tracking for better insights.";
+    };
+
+    const getAverageStats = () => {
+        const recent = state.sleepLogs.slice(-7);
+        if (recent.length === 0) return { hours: 0, quality: 0 };
+
+        return {
+            hours: (recent.reduce((sum, log) => sum + log.hoursSlept, 0) / recent.length).toFixed(1),
+            quality: (recent.reduce((sum, log) => sum + log.sleepQuality, 0) / recent.length).toFixed(1),
+        };
+    };
+
+    const avgStats = getAverageStats();
+    const [sleepData, setSleepData] = useState<SleepList>([]);
+    useEffect(() => {
+        getAllSleep().then(data => {
+            setSleepData(data)
+        })
+    }, [])
+
+    const calculateSevenDayAvgHours = () => {
+        const recentLogs = sleepData.slice(-7);
+        if (recentLogs.length === 0) return 0;
+        console.log(recentLogs);
+
+        const totalHours = recentLogs.reduce((sum, log) => sum + log.Duration, 0);
+        return (totalHours / recentLogs.length).toFixed(1);
+    }
+
+    const calculateSevenDayAvgQuality = () => {
+        const recentLogs = sleepData.slice(-7);
+        if (recentLogs.length === 0) return 0;
+
+        const totalQuality = recentLogs.reduce((sum, log) => sum + log.Quality, 0);
+        return (totalQuality / recentLogs.length).toFixed(1);
+    }
+
+    return (
+        <View style={styles.container}>
+            <StatusBar barStyle="light-content" backgroundColor="#9AE6E0"/>
+            <View style={styles.headerContainer}>
+                <View style={styles.headerGradient}>
+                    <Text style={styles.header}>Sleep Tracker</Text>
+                    <Text style={styles.subheader}>Monitor sleep quality and morning symptoms</Text>
+                </View>
             </View>
-          </View>
-        )}
 
-        {/* Date Selection */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Date</Text>
-          <DatePickerInput
-            value={selectedDate}
-            onDateChange={setSelectedDate}
-            themeColor="#9AE6E0"
-            placeholder="Select sleep date"
-          />
+            <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                {/* Sleep Stats */}
+                {state.sleepLogs.length > 0 && (
+                    <View style={styles.statsContainer}>
+                        <Text style={styles.statsTitle}>7-Day Sleep Averages</Text>
+                        <View style={styles.statsRow}>
+                            <View style={styles.statCard}>
+                                <Text style={styles.statNumber}>{calculateSevenDayAvgHours()}h</Text>
+                                <Text style={styles.statLabel}>Avg Hours</Text>
+                            </View>
+                            <View style={styles.statCard}>
+                                <Text style={styles.statNumber}>{calculateSevenDayAvgQuality()}/10</Text>
+                                <Text style={styles.statLabel}>Avg Quality</Text>
+                            </View>
+                        </View>
+                    </View>
+                )}
+
+                {/* Date Selection */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Date</Text>
+                    <DatePickerInput
+                        value={selectedDate}
+                        onDateChange={setSelectedDate}
+                        themeColor="#9AE6E0"
+                        placeholder="Select sleep date"
+                    />
+                </View>
+
+                {/* Hours Slept */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Hours Slept</Text>
+                    <TextInput
+                        style={styles.hoursInput}
+                        value={hoursSlept}
+                        onChangeText={setHoursSlept}
+                        placeholder="e.g., 7.5"
+                        keyboardType="decimal-pad"
+                    />
+                </View>
+
+                {/* Sleep Quality */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Sleep Quality</Text>
+                    <Text style={styles.sectionSubtitle}>
+                        Rate overall sleep quality (1-10 scale)
+                    </Text>
+
+                    <SymptomSlider
+                        label="Sleep Quality"
+                        value={sleepQuality}
+                        onValueChange={setSleepQuality}
+                        color="#9AE6E0"
+                        description="1 = Terrible sleep, 10 = Perfect sleep"
+                    />
+                </View>
+
+
+                {/* Sleep Disruptions */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Sleep Disruptions</Text>
+                    <TextInput
+                        style={styles.disruptionsInput}
+                        value={sleepDisruptions}
+                        onChangeText={setSleepDisruptions}
+                        placeholder="e.g., pain, bathroom trips, anxiety, hot flashes..."
+                    />
+                </View>
+
+                {/* Notes */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Sleep Notes</Text>
+                    <TextInput
+                        style={styles.notesInput}
+                        value={notes}
+                        onChangeText={setNotes}
+                        placeholder="Bedtime routine, medications taken, dreams, how you felt..."
+                        multiline
+                        numberOfLines={3}
+                    />
+                </View>
+
+                {/* Log Button */}
+                <TouchableOpacity style={styles.logButton} onPress={handleLogSleep}>
+                    <Text style={styles.logButtonText}>Log Sleep Data</Text>
+                </TouchableOpacity>
+
+                {/* Sleep Insights */}
+                <View style={styles.insightCard}>
+                    <Text style={styles.insightTitle}>Sleep Pattern Analysis</Text>
+                    <Text style={styles.insightText}>{getSleepInsights()}</Text>
+                    {/* TODO: Add sleep pattern graphs, bedtime tracking */}
+                    <Text style={styles.futureFeature}>
+                        Coming soon: Sleep pattern visualization, bedtime tracking, and correlation with symptom flares
+                    </Text>
+                </View>
+
+                {/* Sleep Trends Chart */}
+                <SleepChart
+                    sleepLogs={state.sleepLogs}
+                    title="Sleep Trends"
+                />
+            </ScrollView>
         </View>
-
-        {/* Hours Slept */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hours Slept</Text>
-          <TextInput
-            style={styles.hoursInput}
-            value={hoursSlept}
-            onChangeText={setHoursSlept}
-            placeholder="e.g., 7.5"
-            keyboardType="decimal-pad"
-          />
-        </View>
-
-        {/* Sleep Quality */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sleep Quality</Text>
-          <Text style={styles.sectionSubtitle}>
-            Rate overall sleep quality (1-10 scale)
-          </Text>
-          
-          <SymptomSlider
-            label="Sleep Quality"
-            value={sleepQuality}
-            onValueChange={setSleepQuality}
-            color="#9AE6E0"
-            description="1 = Terrible sleep, 10 = Perfect sleep"
-          />
-        </View>
-
-        
-        {/* Sleep Disruptions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sleep Disruptions</Text>
-          <TextInput
-            style={styles.disruptionsInput}
-            value={sleepDisruptions}
-            onChangeText={setSleepDisruptions}
-            placeholder="e.g., pain, bathroom trips, anxiety, hot flashes..."
-          />
-        </View>
-
-        {/* Notes */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sleep Notes</Text>
-          <TextInput
-            style={styles.notesInput}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="Bedtime routine, medications taken, dreams, how you felt..."
-            multiline
-            numberOfLines={3}
-          />
-        </View>
-
-        {/* Log Button */}
-        <TouchableOpacity style={styles.logButton} onPress={handleLogSleep}>
-          <Text style={styles.logButtonText}>Log Sleep Data</Text>
-        </TouchableOpacity>
-
-        {/* Sleep Insights */}
-        <View style={styles.insightCard}>
-          <Text style={styles.insightTitle}>Sleep Pattern Analysis</Text>
-          <Text style={styles.insightText}>{getSleepInsights()}</Text>
-          {/* TODO: Add sleep pattern graphs, bedtime tracking */}
-          <Text style={styles.futureFeature}>
-            Coming soon: Sleep pattern visualization, bedtime tracking, and correlation with symptom flares
-          </Text>
-        </View>
-
-        {/* Sleep Trends Chart */}
-        <SleepChart 
-          sleepLogs={state.sleepLogs}
-          title="Sleep Trends"
-        />
-      </ScrollView>
-    </View>
-  );
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F9F8',
-  },
-  headerContainer: {
-    marginBottom: 0,
-  },
-  headerGradient: {
-    backgroundColor: '#9AE6E0',
-    paddingTop: 60,
-    paddingBottom: 25,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
-    shadowColor: '#9AE6E0',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subheader: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    opacity: 0.9,
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  statsContainer: {
-    backgroundColor: '#EBF8F7',
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 25,
-    borderLeftWidth: 4,
-    borderLeftColor: '#9AE6E0',
-  },
-  statsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 15,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 15,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#9AE6E0',
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#7F8C8D',
-    marginTop: 5,
-  },
-  section: {
-    marginBottom: 25,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 10,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: '#7F8C8D',
-    marginBottom: 15,
-  },
-  dateInput: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 10,
-    padding: 15,
-    backgroundColor: '#FFF',
-    fontSize: 16,
-  },
-  hoursInput: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 10,
-    padding: 15,
-    backgroundColor: '#FFF',
-    fontSize: 16,
-  },
-  disruptionsInput: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 10,
-    padding: 15,
-    backgroundColor: '#FFF',
-    fontSize: 16,
-  },
-  notesInput: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 10,
-    padding: 15,
-    backgroundColor: '#FFF',
-    fontSize: 16,
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  logButton: {
-    backgroundColor: '#9AE6E0',
-    padding: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 25,
-  },
-  logButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  insightCard: {
-    backgroundColor: '#EBF8F7',
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 25,
-    borderLeftWidth: 4,
-    borderLeftColor: '#9AE6E0',
-  },
-  insightTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 10,
-  },
-  insightText: {
-    fontSize: 14,
-    color: '#2C3E50',
-    marginBottom: 10,
-  },
-  futureFeature: {
-    fontSize: 12,
-    color: '#7F8C8D',
-    fontStyle: 'italic',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: "#F2F9F8",
+    },
+    headerContainer: {
+        marginBottom: 0,
+    },
+    headerGradient: {
+        backgroundColor: "#9AE6E0",
+        paddingTop: 60,
+        paddingBottom: 25,
+        paddingHorizontal: 20,
+        borderBottomLeftRadius: 35,
+        borderBottomRightRadius: 35,
+        shadowColor: "#9AE6E0",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    header: {
+        fontSize: 28,
+        fontWeight: "bold",
+        color: "#FFFFFF",
+        marginBottom: 8,
+        textAlign: "center",
+    },
+    subheader: {
+        fontSize: 16,
+        color: "#FFFFFF",
+        textAlign: "center",
+        opacity: 0.9,
+    },
+    scrollView: {
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingTop: 20,
+    },
+    statsContainer: {
+        backgroundColor: "#EBF8F7",
+        padding: 20,
+        borderRadius: 15,
+        marginBottom: 25,
+        borderLeftWidth: 4,
+        borderLeftColor: "#9AE6E0",
+    },
+    statsTitle: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#2C3E50",
+        marginBottom: 15,
+    },
+    statsRow: {
+        flexDirection: "row",
+        gap: 15,
+    },
+    statCard: {
+        flex: 1,
+        backgroundColor: "#FFF",
+        padding: 15,
+        borderRadius: 12,
+        alignItems: "center",
+    },
+    statNumber: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#9AE6E0",
+    },
+    statLabel: {
+        fontSize: 12,
+        color: "#7F8C8D",
+        marginTop: 5,
+    },
+    section: {
+        marginBottom: 25,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: "600",
+        color: "#2C3E50",
+        marginBottom: 10,
+    },
+    sectionSubtitle: {
+        fontSize: 14,
+        color: "#7F8C8D",
+        marginBottom: 15,
+    },
+    dateInput: {
+        borderWidth: 1,
+        borderColor: "#E0E0E0",
+        borderRadius: 10,
+        padding: 15,
+        backgroundColor: "#FFF",
+        fontSize: 16,
+    },
+    hoursInput: {
+        borderWidth: 1,
+        borderColor: "#E0E0E0",
+        borderRadius: 10,
+        padding: 15,
+        backgroundColor: "#FFF",
+        fontSize: 16,
+    },
+    disruptionsInput: {
+        borderWidth: 1,
+        borderColor: "#E0E0E0",
+        borderRadius: 10,
+        padding: 15,
+        backgroundColor: "#FFF",
+        fontSize: 16,
+    },
+    notesInput: {
+        borderWidth: 1,
+        borderColor: "#E0E0E0",
+        borderRadius: 10,
+        padding: 15,
+        backgroundColor: "#FFF",
+        fontSize: 16,
+        minHeight: 80,
+        textAlignVertical: "top",
+    },
+    logButton: {
+        backgroundColor: "#9AE6E0",
+        padding: 18,
+        borderRadius: 12,
+        alignItems: "center",
+        marginBottom: 25,
+    },
+    logButtonText: {
+        color: "#FFF",
+        fontSize: 18,
+        fontWeight: "600",
+    },
+    insightCard: {
+        backgroundColor: "#EBF8F7",
+        padding: 20,
+        borderRadius: 15,
+        marginBottom: 25,
+        borderLeftWidth: 4,
+        borderLeftColor: "#9AE6E0",
+    },
+    insightTitle: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#2C3E50",
+        marginBottom: 10,
+    },
+    insightText: {
+        fontSize: 14,
+        color: "#2C3E50",
+        marginBottom: 10,
+    },
+    futureFeature: {
+        fontSize: 12,
+        color: "#7F8C8D",
+        fontStyle: "italic",
+    },
 });
 
 export default SleepScreen;
