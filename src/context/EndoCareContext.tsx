@@ -19,7 +19,6 @@ export interface PeriodLog {
     type: string;
     flowLevel?: string;
     notes?: string;
-    // TODO: Add cycle length tracking, ovulation indicators
 }
 
 export interface FoodLog {
