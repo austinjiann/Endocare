@@ -12,6 +12,7 @@ import { useEndoCare } from '../context/EndoCareContext';
 import { useAlert } from '../context/AlertContext';
 import SymptomSlider from '../components/SymptomSlider';
 import DatePickerInput from '../components/DatePickerInput';
+import MenstrualChart from '../components/MenstrualChart';
 
 const PeriodScreen = () => {
   const { state, addPeriodLog } = useEndoCare();
@@ -199,55 +200,14 @@ const PeriodScreen = () => {
         <View style={styles.insightCard}>
           <Text style={styles.insightTitle}>Cycle Insights</Text>
           <Text style={styles.insightText}>{getCycleInsights()}</Text>
-          {/* TODO: Add cycle length calculation, ovulation prediction */}
-          <Text style={styles.futureFeature}>
-            📅 Coming soon: Cycle length tracking, ovulation prediction, and symptom pattern analysis
-          </Text>
+  
         </View>
 
-        {/* Recent Period Logs */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Period Logs</Text>
-          {state.periodLogs.length === 0 ? (
-            <Text style={styles.emptyText}>No period logs yet</Text>
-          ) : (
-            state.periodLogs.slice(-8).reverse().map(log => (
-              <View key={log.id} style={styles.logCard}>
-                <View style={styles.logHeader}>
-                  <Text style={styles.logDate}>{log.date}</Text>
-                  <View style={styles.logTypeContainer}>
-                    <Text style={[
-                      styles.logType,
-                      log.type === 'start' ? styles.startType : styles.endType
-                    ]}>
-                      {log.type === 'start' ? 'Start' : 'End'}
-                    </Text>
-                  </View>
-                </View>
-                
-                {log.flowLevel && (
-                  <Text style={styles.logDetail}>
-                    Flow Level: {log.flowLevel}/5
-                  </Text>
-                )}
-                
-                {log.associatedSymptoms && (
-                  <View style={styles.symptomRow}>
-                    <Text style={styles.logDetail}>
-                      Symptoms - Nausea: {log.associatedSymptoms.nausea}, 
-                      Fatigue: {log.associatedSymptoms.fatigue}, 
-                      Pain: {log.associatedSymptoms.pain}
-                    </Text>
-                  </View>
-                )}
-                
-                {log.notes && (
-                  <Text style={styles.logNotes}>{log.notes}</Text>
-                )}
-              </View>
-            ))
-          )}
-        </View>
+        {/* Menstrual Cycle Chart */}
+        <MenstrualChart 
+          periodLogs={state.periodLogs}
+          title="Menstrual Cycle Trends"
+        />
       </ScrollView>
     </View>
   );
@@ -414,67 +374,6 @@ const styles = StyleSheet.create({
   futureFeature: {
     fontSize: 12,
     color: '#7F8C8D',
-    fontStyle: 'italic',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#7F8C8D',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    marginTop: 20,
-  },
-  logCard: {
-    backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#F4A8C0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  logHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  logDate: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2C3E50',
-  },
-  logTypeContainer: {
-    backgroundColor: '#F8F9FA',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  logType: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  startType: {
-    color: '#F4A8C0',
-  },
-  endType: {
-    color: '#F4A8C0',
-  },
-  logDetail: {
-    fontSize: 14,
-    color: '#2C3E50',
-    marginBottom: 4,
-  },
-  symptomRow: {
-    marginBottom: 4,
-  },
-  logNotes: {
-    fontSize: 14,
-    color: '#7F8C8D',
-    marginTop: 5,
     fontStyle: 'italic',
   },
 });

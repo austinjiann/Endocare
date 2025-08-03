@@ -14,12 +14,17 @@
     "@react-navigation/bottom-tabs": "^7.4.4",
     "@react-navigation/material-top-tabs": "^7.3.4",
     "@react-navigation/native": "^7.1.16",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0",
     "expo": "^53.0.20",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
     "react-native": "0.79.5",
+    "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
+    "react-native-svg": "^7.2.1",
+    "react-native-svg-charts": "^5.4.0",
     "react-native-tab-view": "^4.1.2"
   },
   "devDependencies": {

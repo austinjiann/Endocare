@@ -228,10 +228,6 @@ const FoodScreen = () => {
         <View style={styles.insightCard}>
           <Text style={styles.insightTitle}>Trigger Pattern Analysis</Text>
           <Text style={styles.insightText}>{getTriggerInsights()}</Text>
-          {/* TODO: Add ingredient analysis, elimination diet suggestions */}
-          <Text style={styles.futureFeature}>
-            🔬 Coming soon: Ingredient analysis, elimination diet tracking, and trigger correlation graphs
-          </Text>
         </View>
 
         {/* Recent Food Logs */}

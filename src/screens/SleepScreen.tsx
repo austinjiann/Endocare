@@ -12,6 +12,7 @@ import { useEndoCare } from '../context/EndoCareContext';
 import { useAlert } from '../context/AlertContext';
 import SymptomSlider from '../components/SymptomSlider';
 import DatePickerInput from '../components/DatePickerInput';
+import SleepChart from '../components/SleepChart';
 
 const SleepScreen = () => {
   const { state, addSleepLog } = useEndoCare();
@@ -244,45 +245,11 @@ const SleepScreen = () => {
           </Text>
         </View>
 
-        {/* Recent Sleep Logs */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Sleep Logs</Text>
-          {state.sleepLogs.length === 0 ? (
-            <Text style={styles.emptyText}>No sleep logs yet</Text>
-          ) : (
-            state.sleepLogs.slice(-7).reverse().map(log => (
-              <View key={log.id} style={styles.logCard}>
-                <View style={styles.logHeader}>
-                  <Text style={styles.logDate}>{log.date}</Text>
-                  <View style={styles.sleepMetrics}>
-                    <Text style={styles.sleepHours}>{log.hoursSlept}h</Text>
-                    <Text style={styles.sleepQuality}>
-                      Quality: {log.sleepQuality}/10
-                    </Text>
-                  </View>
-                </View>
-                
-                {log.morningSymptoms && (
-                  <Text style={styles.logSymptoms}>
-                    Morning - Nausea: {log.morningSymptoms.nausea}, 
-                    Fatigue: {log.morningSymptoms.fatigue}, 
-                    Pain: {log.morningSymptoms.pain}
-                  </Text>
-                )}
-                
-                {log.sleepDisruptions && (
-                  <Text style={styles.logDisruptions}>
-                    Disruptions: {log.sleepDisruptions}
-                  </Text>
-                )}
-                
-                {log.notes && (
-                  <Text style={styles.logNotes}>{log.notes}</Text>
-                )}
-              </View>
-            ))
-          )}
-        </View>
+        {/* Sleep Trends Chart */}
+        <SleepChart 
+          sleepLogs={state.sleepLogs}
+          title="Sleep Trends"
+        />
       </ScrollView>
     </View>
   );
@@ -444,65 +411,6 @@ const styles = StyleSheet.create({
   futureFeature: {
     fontSize: 12,
     color: '#7F8C8D',
-    fontStyle: 'italic',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#7F8C8D',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    marginTop: 20,
-  },
-  logCard: {
-    backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#9AE6E0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  logHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  logDate: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2C3E50',
-  },
-  sleepMetrics: {
-    alignItems: 'flex-end',
-  },
-  sleepHours: {
-    fontSize: 16,
-    color: '#9AE6E0',
-    fontWeight: '600',
-  },
-  sleepQuality: {
-    fontSize: 12,
-    color: '#7F8C8D',
-  },
-  logSymptoms: {
-    fontSize: 14,
-    color: '#2C3E50',
-    marginBottom: 4,
-  },
-  logDisruptions: {
-    fontSize: 14,
-    color: '#9AE6E0',
-    marginBottom: 4,
-  },
-  logNotes: {
-    fontSize: 14,
-    color: '#7F8C8D',
-    marginTop: 5,
     fontStyle: 'italic',
   },
 });
