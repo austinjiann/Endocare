@@ -122,10 +122,7 @@ const DashboardScreen = ({ navigation }: any) => {
 
                 <TrackerCard
                     title="Period Tracker"
-                    subtitle={recentPeriodLog ?
-                        `Last: ${recentPeriodLog.type} on ${new Date(recentPeriodLog.date).toLocaleDateString()}` :
-                        "Start tracking your cycle"
-                    }
+                    subtitle="Monitor your menstrual cycle"
                     backgroundColor="#F4F1F7"
                     iconText=""
                     onPress={() => navigation.navigate("Period")}
@@ -133,10 +130,7 @@ const DashboardScreen = ({ navigation }: any) => {
 
                 <TrackerCard
                     title="Food & Triggers"
-                    subtitle={recentFoodLog ?
-                        `Last meal: ${recentFoodLog.foodItems.substring(0, 30)}...` :
-                        "Track potential trigger foods"
-                    }
+                    subtitle="Log meals and identify triggers"
                     backgroundColor="#F4F1F7"
                     iconText=""
                     onPress={() => navigation.navigate("Food")}
@@ -144,10 +138,7 @@ const DashboardScreen = ({ navigation }: any) => {
 
                 <TrackerCard
                     title="Sleep Patterns"
-                    subtitle={recentSleepLog ?
-                        `Last night: ${recentSleepLog.hoursSlept}h (${recentSleepLog.sleepQuality}/10)` :
-                        "Monitor sleep quality"
-                    }
+                    subtitle={"Track your sleep quality and duration"}
                     backgroundColor="#F4F1F7"
                     iconText=""
                     onPress={() => navigation.navigate("Sleep")}
